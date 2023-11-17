@@ -35,6 +35,7 @@ static int lpsxxx_handler(void){
         lpsxxx_read_temp(&lpsxxx, &temp);
         sum += temp;
     }
+    // Calc average
     data.temperature = sum / 10;
 
     printf("Temperature: %i.%u°C\n", (data.temperature / 100), (data.temperature % 100));

@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = sensonrs-test
+APPLICATION = iot2023
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= iotlab-m3
@@ -22,7 +22,6 @@ USEMODULE += ztimer_msec
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += lps331ap
-#USEMODULE += lsm303dlhc
 USEMODULE += ps
 USEMODULE += xtimer
 
