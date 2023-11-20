@@ -1,11 +1,16 @@
 import datetime
 import logging
+import os
 
 import asyncio
 
 import aiocoap.resource as resource
 from aiocoap.numbers.contentformat import ContentFormat
 import aiocoap
+
+from pathlib import Path
+
+IP_ADRESS = "2600:1900:4150:7757:0:0:0:0"
 
 class Welcome(resource.Resource):
     representations = {
@@ -67,8 +72,11 @@ class TemperatureResource(resource.Resource):
     #     return aiocoap.Message(payload=self.content)
 
     async def render_put(self, request):
-        print('PUT payload: %s' % request.payload)
+        print('PUT payload: %s' % request.payload) #TODO: Change to logger
         self.set_content(request.payload)
+        temperature = request.payload.decode()
+        write_temperature_to_file(temperature)
+        
         return aiocoap.Message(code=aiocoap.CHANGED, payload=self.content)
 
 
@@ -139,12 +147,43 @@ class WhoAmI(resource.Resource):
         return aiocoap.Message(content_format=0,
                 payload="\n".join(text).encode('utf8'))
 
-# logging setup
+def set_logger():
+    logs_dir = os.path.join(Path(__file__).resolve().parent, "logs")
 
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("coap-server").setLevel(logging.DEBUG)
+    if not os.path.exists("logs"):
+        os.mkdir(logs_dir)
 
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
+    logfile = logs_dir + f"/CoAp_server_{current_time}.log"
+    print(logfile)
+
+    logging.basicConfig(filename=logfile,
+                        filemode='a',
+                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
+
+    logging.debug("Logger set up")
+
+    return logging.getLogger('')
+
+def write_temperature_to_file(temperature):
+    data_dir = os.path.join(Path(__file__).resolve().parent, "data")
+
+    if not os.path.exists("data"):
+        os.mkdir(data_dir)
+    
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+    temperatureFile = data_dir + f"/temperature_{current_time}.txt"
+    f = open(temperatureFile, "a")
+
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
+    f.write(f"{current_time},{temperature}\n")
+    f.close()
+    
 async def main():
+    set_logger()
+    
     # Resource tree creation
     root = resource.Site()
 
@@ -157,7 +196,8 @@ async def main():
     root.add_resource(['temperature'], TemperatureResource())
     root.add_resource(['whoami'], WhoAmI())
 
-    await aiocoap.Context.create_server_context(root, bind=("2600:1900:4150:7757:0:0:0:0", None))
+    await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, None))
+    # await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, None), transports=["udp6"])
 
     # Run forever
     await asyncio.get_running_loop().create_future()
