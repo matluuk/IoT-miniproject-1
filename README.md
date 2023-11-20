@@ -9,6 +9,16 @@ Fill the <site>
 iotlab-experiment submit -n "IoT-Miniproject-1" -d 60 -l 2,archi=m3:at86rf231+site=<site>
 ```
 
+Wait that the experiment is on runnig state
+```
+iotlab-experiment wait --timeout 30 --cancel-on-timeout
+```
+
+Check which nodes you got with following command
+```
+iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
+```
+
 # Set up border router
 
 Run start_border_router.sh after booking the experiment
