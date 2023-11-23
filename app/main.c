@@ -13,7 +13,7 @@
 
 #include "net/gcoap.h"
 #include "fmt.h"
-#include "gcoap_cli.h"
+//#include "gcoap_cli.h"
 
 // The lps331ap device variable and stack
 static lpsxxx_t lpsxxx;
@@ -159,6 +159,9 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
+            
+            uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
+
             // Datan lähetys serverille
             char response[32];
             uint16_t temp = data.temperature;
@@ -166,7 +169,7 @@ static void *lpsxxx_sniffer_thread(void *arg) {
             temp -= temp_abs * 100;
             sprintf(response, "%2i.%02i",temp_abs, temp);
 
-            _send(&response, sizeof(response), "2600:1900:4150:7757::", "8683");
+            _send(&buf[0], sizeof(response), "2600:1900:4150:7757::", "8683");
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");

@@ -93,7 +93,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
+size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 {
     ipv6_addr_t addr;
     size_t bytes_sent;
