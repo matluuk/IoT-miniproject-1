@@ -183,12 +183,26 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     # Choose a free prefix, for example <ipv6_prefix> = 2001:660:5307:3108
     ```
 
+7. After launching ethos_uhcpd, leave the script running!
+
 
 ## Usage
 
 To use this project, follow these guidelines:
 
-1. Flash the firmware into the experiment node:
+1. Connect to grenoble.iot-lab.info IF not already:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Change into the miniproject-1 repository working directory:
+
+    ```bash
+    cd IoT-miniproject-1/app
+    ```
+
+3. Flash the firmware into the experiment node:
 
     ```bash
     make IOTLAB_NODE=auto flash
