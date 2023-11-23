@@ -212,9 +212,9 @@ To use this project, follow these guidelines:
 
 After finished with the experiment, stop your experiment to free up the experiment nodes at Fit IoT-Lab:
 
-    ```bash
-    iotlab-experiment stop
-    ```
+```bash
+iotlab-experiment stop
+```
 
 
 ## Code Structure
