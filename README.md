@@ -34,6 +34,10 @@ Before you begin, ensure you have the following:
 
 With SSH connection to grenoble.iot-lab.info
 
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
 1. Clone the repository to your folder of choise:
 
     ```bash
