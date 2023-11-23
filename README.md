@@ -44,7 +44,7 @@ Before you begin, ensure you have the following:
     git clone https://github.com/matluuk/IoT-miniproject-1.git
     ```
 
-3. Change into the working directory:
+3. Change into the miniproject-1 repository working directory:
 
     ```bash
     cd IoT-miniproject-1/app
@@ -76,6 +76,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 2. Submit an experiment at grenoble for 20 minutes:
 
     ```bash
+    # Command returns the ID of both nodes, they are needed later!
     iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
     ```
 
@@ -105,19 +106,20 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     cd IoT-miniproject-1
     ```
 
-3. Run start_border_router.sh after booking the experiment
+3. Run flash_border_router.sh after booking the experiment:
 
     ```bash
-    sh start_border_router.sh <board-id>
+    # <board-id> = Select one ID from section "Set up Fit IoT-Lab experiment" point 2.
+    sh flash_border_router.sh <board-id>
     ```
 
-4. Check which tap interfaces are open
+4. Check which tap interfaces are open:
 
     ```bash
     ip addr show | grep tap
     ```
 
-5. Check which ipv6 prefixes are already used
+5. Check which ipv6 prefixes are already used:
 
     ```bash
     ip -6 route
@@ -162,12 +164,14 @@ The project has the following code structure:
 .
 ├── app
 │   ├── main.c
-│   ├── Makefile
-│   
+│   └── Makefile
+├── Coap-Server
+│   ├── server.py
+│   └── start_server.sh
 ├── RIOT
 │   └── ...
-├── README.md
-└── ...
+├── flash_border_router.sh
+└── README.md
 ```
 
 ## Authors
