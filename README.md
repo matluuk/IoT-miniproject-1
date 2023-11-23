@@ -14,8 +14,8 @@ Briefly describe the purpose and goals of your IoT mini project.
 
 ## Features
 
-- **Feature 1:** [Description of Feature 1]
-- **Feature 2:** [Description of Feature 2]
+- **Real-time Sensor Data:** Monitor and display real-time sensor data from the LPSXXX sensor.
+- **Energy-Efficient Reading:** Implement an energy-efficient reading thread for prolonged device battery life.
 - ...
 
 ## Getting Started
@@ -28,7 +28,11 @@ Before you begin, ensure you have the following:
 
 2. SSH connection to grenoble.iot-lab.info
 
-### Installation
+3. Access to virtual machine running some linux distro.
+
+### Building the project
+
+With SSH connection to grenoble.iot-lab.info
 
 1. Clone the repository to your folder of choise:
 
@@ -57,12 +61,12 @@ Before you begin, ensure you have the following:
 
 ### Additional Configuration
 
-Set up Fit IoT-Lab experiment:
+Set up Fit IoT-Lab experiment with two nodes for device firmware and border router:
 
-1. Submit an experiment at grenoble for 10 minutes:
+1. Submit an experiment at grenoble for 20 minutes:
 
     ```bash
-    iotlab-experiment submit -n "IoT-miniproject-1" -d 10 -l 1,archi=m3:at86rf231+site=grenoble
+    iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
     ```
 
 2. Wait for the experiment to be in the Running state:
@@ -71,6 +75,11 @@ Set up Fit IoT-Lab experiment:
     iotlab-experiment wait --timeout 30 --cancel-on-timeout
     ```
 
+3. Get the experiment nodes list:
+
+    ```bash
+    iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
+    ```
 
 ## Usage
 
@@ -78,9 +87,17 @@ To use this project, follow these guidelines:
 
 1. Flash the firmware into the experiment node:
 
-```bash
-make IOTLAB_NODE=auto flash
-```
+    ```bash
+    make IOTLAB_NODE=auto flash
+    ```
+
+Free up resources:
+
+    After finished with the experiment, stop your experiment to free up the experiment nodes at Fit IoT-Lab:
+
+    ```bash
+    iotlab-experiment stop
+    ```
 
 
 ## Code Structure
@@ -98,7 +115,6 @@ The project has the following code structure:
 ├── README.md
 └── ...
 ```
-
 
 ## Authors
 
