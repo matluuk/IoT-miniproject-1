@@ -2,21 +2,21 @@
 
 ## Overview
 
-Briefly describe the purpose and goals of your IoT mini project.
+### Introduction
+
+**IoT-miniproject-1** is the first part of the project work assigned at the Internet of Things (521043S-3004) course at University of Oulu in 2023. Goal of the project is to create a firmware for a spesific microcontroller, enabling a secure and energy-efficent transmission of sensor data from microcontroller to a cloud-backend. 
+
+The project uses [Fit IoT-Lab](https://www.iot-lab.info/) remote testbed to book IoT-devices, to program them, interact with them and control them.
+
+
 
 ## Table of Contents
 
-- [Features](#features)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Code Structure](#code-structure)
 - [Authors](#authors)
 
-## Features
-
-- **Real-time Sensor Data:** Monitor and display real-time sensor data from the LPSXXX sensor.
-- **Energy-Efficient Reading:** Implement an energy-efficient reading thread for prolonged device battery life.
-- ...
 
 ## Getting Started
 
