@@ -28,6 +28,7 @@ USEMODULE += xtimer
 
 
 USEMODULE += netdev_default
+USEMODULE += netutils
 USEMODULE += auto_init_gnrc_netif
 
 USEMODULE += gnrc_ipv6_default

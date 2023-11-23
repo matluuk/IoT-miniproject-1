@@ -13,6 +13,7 @@
 
 #include "net/gcoap.h"
 #include "fmt.h"
+#include "gcoap_cli.h"
 
 // The lps331ap device variable and stack
 static lpsxxx_t lpsxxx;
@@ -21,6 +22,8 @@ static char lpsxxx_sniffer_stack[THREAD_STACKSIZE_MAIN];
 
 // Thread pid variable
 static kernel_pid_t main_pid, lpsxxx_read_pid, lpsxxx_sniffer_pid;
+
+extern size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str);
 
 //The struct used to handle the temperature and mutex
 typedef struct {
@@ -157,33 +160,13 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         if (compareTo_LastSent() == 1) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
             // Datan lähetys serverille
-            coap_pkt_t* pdu = "/temperature";
-            uint8_t *buf = COAP_GET;
-            size_t len = 32;
-            void *ctx = NULL;
-            
-            gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-            coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
-            size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-            
             char response[32];
             uint16_t temp = data.temperature;
             int temp_abs = data.temperature / 100;
             temp -= temp_abs * 100;
-            sprintf(response, "%2i.%02i°C",temp_abs, temp);
+            sprintf(response, "%2i.%02i",temp_abs, temp);
 
-            /* write the temperature value in the response buffer */
-            if (pdu->payload_len >= strlen(response)) 
-            {
-                memcpy(pdu->payload, response, strlen(response));
-                // return resp_len + strlen(response);
-            }
-            else 
-            {
-                puts("gcoap: msg buffer too small");
-                // return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
-            }
-            _send(buf, len, "2600:1900:4150:7757::", "8683");
+            _send(&response, sizeof(response), "2600:1900:4150:7757::", "8683");
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
