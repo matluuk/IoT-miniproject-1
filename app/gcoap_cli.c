@@ -5,7 +5,6 @@
 #include "net/gcoap.h"
 #include "od.h"
 
-
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -93,7 +92,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
+static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 {
     ipv6_addr_t addr;
     size_t bytes_sent;
@@ -143,4 +142,79 @@ size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
         req_count++;
     }
     return bytes_sent;
+}
+
+int gcoap_cli_cmd(char method)
+{
+    // Only acceptable methods are shown below
+    char *method_codes[] = {"get", "post", "put"};
+    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
+    coap_pkt_t pdu;
+    size_t len;
+
+    int code_pos = -1;
+    for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
+        if (strcmp(method, method_codes[i]) == 0) {
+            code_pos = i;
+        }
+    }
+    if (code_pos == -1) {
+        goto end;
+    }
+
+    gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos+1, NULL);
+    coap_hdr_set_type(pdu.hdr, COAP_TYPE_NON);
+    coap_opt_add_
+
+
+    /*
+     * "get" (code_pos 0) must have exactly apos + 3 arguments
+     * while "post" (code_pos 1) and "put" (code_pos 2) and must have exactly
+     * apos + 4 arguments
+     */
+    if (((argc == apos + 3) && (code_pos == 0)) ||
+        ((argc == apos + 4) && (code_pos != 0))) {
+        gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
+        coap_hdr_set_type(pdu.hdr, msg_type);
+
+        memset(_last_req_path, 0, _LAST_REQ_PATH_MAX);
+        if (strlen(argv[apos+2]) < _LAST_REQ_PATH_MAX) {
+            memcpy(_last_req_path, argv[apos+2], strlen(argv[apos+2]));
+        }
+
+        size_t paylen = (argc == apos + 4) ? strlen(argv[apos+3]) : 0;
+        if (paylen) {
+            coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
+            if (pdu.payload_len >= paylen) {
+                memcpy(pdu.payload, argv[apos+3], paylen);
+                len += paylen;
+            }
+            else {
+                puts("gcoap_cli: msg buffer too small");
+                return 1;
+            }
+        }
+        else {
+            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
+        }
+
+        printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
+               (unsigned) len);
+        if (!_send(&buf[0], len, argv[apos], argv[apos+1])) {
+            puts("gcoap_cli: msg send failed");
+        }
+        return 0;
+    }
+    else {
+        printf("usage: %s <get|post|put> [-c] <addr>[%%iface] <port> <path> [data]\n",
+               argv[0]);
+        printf("Options\n");
+        printf("    -c  Send confirmably (defaults to non-confirmable)\n");
+        return 1;
+    }
+
+    end:
+    printf("usage: %s <get|post|put|info>\n", argv[0]);
+    return 1;
 }
