@@ -116,10 +116,10 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     # Example to get correct <board.id>
 
     user@grenoble.iot-lab.info:~$ iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
-[
+    [
     "m3-6.grenoble.iot-lab.info",
     "m3-7.grenoble.iot-lab.info"
-]
+    ]
     # In this example <board-id> = "6" or "7"
     # Only need to pick one ID!
     ```
