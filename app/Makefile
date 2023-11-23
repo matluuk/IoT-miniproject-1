@@ -4,8 +4,6 @@ APPLICATION = iot2023
 # If no BOARD is found in the environment, use this default:
 BOARD ?= iotlab-m3
 
-FEATURES_REQUIRED += periph_rtc
-
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../RIOT
 
@@ -18,7 +16,6 @@ DEVELHELP ?= 1
 QUIET ?= 0
 
 # Modules to include:
-USEMODULE += ztimer_msec
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += lps331ap
