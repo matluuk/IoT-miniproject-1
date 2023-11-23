@@ -91,6 +91,35 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
     ```
 
+
+### Set up border router
+
+Run start_border_router.sh after booking the experiment
+```bash
+sh start_border_router.sh <board-id>
+```
+
+
+Check which tap interfaces are open
+```bash
+ip addr show | grep tap
+```
+
+Check which ipv6 prefixes are already used
+```bash
+ip -6 route
+```
+On the frontend SSH launch the ethos_uhcpd command with:
+
+a free tap <num> network interface
+
+a free <ipv6_prefix> on the good site. For example the first one of Grenoble site <ipv6_prefix>=2001:660:5307:3100
+
+the good node's <id> for the border router
+```bash
+sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
+```
+
 ## Usage
 
 To use this project, follow these guidelines:
