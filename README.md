@@ -28,7 +28,37 @@ Before you begin, ensure you have the following:
 
 2. SSH connection to grenoble.iot-lab.info
 
-3. Access to virtual machine running some linux distro.
+3. Access to virtual machine running some linux distro to run CoAP server.
+
+Requirements to run the CoAp server in the linux virtual machine
+
+1. Create new python venv
+
+    [Link](https://docs.python.org/3/library/venv.html)
+
+2. intall autoconf on linux 
+
+    ```bash
+    sudo apt-get install autoconf
+    ```
+
+3. install python-dev for 
+
+    ```bash
+    sudo apt-get install python-dev-is-python3 -y
+    ```
+
+4. install build-essential
+
+    ```bash
+    sudo apt-get install build-essential
+    ```
+
+5. intall aiocoap to python venv
+
+    ```bash
+    pip3 install --upgrade "aiocoap[all]"
+    ```
 
 ### Build the project
 
@@ -184,6 +214,9 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ```
 
 7. After launching ethos_uhcpd, leave the script running!
+
+### Set up CoAP server
+
 
 
 ## Usage
