@@ -23,7 +23,7 @@ iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
 
 Run start_border_router.sh after booking the experiment
 ```bash
-sh start_border_router.sh <board-id> <site>
+sh start_border_router.sh <board-id>
 ```
 
 
