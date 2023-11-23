@@ -32,27 +32,31 @@ Before you begin, ensure you have the following:
 
 ### Building the project
 
-With SSH connection to grenoble.iot-lab.info
+1. Connect to grenoble.iot-lab.info:
 
-1. Clone the repository to your folder of choise:
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Clone the repository to your folder of choise at grenoble.iot-lab.info:
 
     ```bash
     git clone https://github.com/matluuk/IoT-miniproject-1.git
     ```
 
-2. Change into the working directory:
+3. Change into the working directory:
 
     ```bash
     cd IoT-miniproject-1/app
     ```
 
-3. Set source:
+4. Set source:
 
     ```bash
     source /opt/riot.source
     ```
 
-4. Build the project:
+5. Build the project:
 
     ```bash
     make
@@ -63,19 +67,25 @@ With SSH connection to grenoble.iot-lab.info
 
 Set up Fit IoT-Lab experiment with two nodes for device firmware and border router:
 
-1. Submit an experiment at grenoble for 20 minutes:
+1. Connect to grenoble.iot-lab.info IF not already:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Submit an experiment at grenoble for 20 minutes:
 
     ```bash
     iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
     ```
 
-2. Wait for the experiment to be in the Running state:
+3. Wait for the experiment to be in the Running state:
 
     ```bash
     iotlab-experiment wait --timeout 30 --cancel-on-timeout
     ```
 
-3. Get the experiment nodes list:
+4. Get the experiment nodes list:
 
     ```bash
     iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
@@ -91,9 +101,9 @@ To use this project, follow these guidelines:
     make IOTLAB_NODE=auto flash
     ```
 
-Free up resources:
+### Free up resources:
 
-    After finished with the experiment, stop your experiment to free up the experiment nodes at Fit IoT-Lab:
+After finished with the experiment, stop your experiment to free up the experiment nodes at Fit IoT-Lab:
 
     ```bash
     iotlab-experiment stop
