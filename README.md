@@ -44,19 +44,31 @@ Before you begin, ensure you have the following:
     git clone https://github.com/matluuk/IoT-miniproject-1.git
     ```
 
-3. Change into the miniproject-1 repository working directory:
+3. Init the RIOT-submodule:
+
+    ```bash
+    git submodule init
+    ```
+
+4. Update the RIOT-submodule:
+
+    ```bash
+    git submodule update
+    ```
+
+5. Change into the miniproject-1 repository working directory:
 
     ```bash
     cd IoT-miniproject-1/app
     ```
 
-4. Set source:
+6. Set source:
 
     ```bash
     source /opt/riot.source
     ```
 
-5. Build the project:
+7. Build the project:
 
     ```bash
     make
@@ -120,7 +132,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     "m3-6.grenoble.iot-lab.info",
     "m3-7.grenoble.iot-lab.info"
     ]
-    # In this example <board-id> = "6" or "7"
+    # In this example <board-id> = 6 or 7
     # Only need to pick one ID!
     ```
 
@@ -136,7 +148,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ip -6 route
     ```
 
-6. On the frontend SSH launch the ethos_uhcpd command with:
+6. Launch the ethos_uhcpd command with:
 
     ```bash
     sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
@@ -156,6 +168,8 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ...
     582: tap8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
     ...
+    # List of network interfaces already in use. This example has 3 network interfaces (eg. tap0, tap1 and tap8). 
+    # Choose a free interface, for example <id> = tap8 + 1 = 9
 
     #For <ipv6_prefix>
     user@grenoble.iot-lab.info:~$ ip -6 route
@@ -165,16 +179,9 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     2001:660:5307:3104::/64 via fe80::2 dev tap4 metric 1024 linkdown  pref medium
     2001:660:5307:3107::/64 via fe80::2 dev tap100 metric 1024 linkdown  pref medium
     ...
-
-
+    # List of ipv6 prefixes in use. 
+    # Choose a free prefix, for example <ipv6_prefix> = 2001:660:5307:3108
     ```
-
-a free tap <num> network interface
-
-a free <ipv6_prefix> on the good site. For example the first one of Grenoble site <ipv6_prefix>=2001:660:5307:3100
-
-the good node's <id> for the border router
-
 
 
 ## Usage
