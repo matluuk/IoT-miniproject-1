@@ -136,7 +136,38 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ip -6 route
     ```
 
-On the frontend SSH launch the ethos_uhcpd command with:
+6. On the frontend SSH launch the ethos_uhcpd command with:
+
+    ```bash
+    sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
+    ```
+
+    ```bash
+    # Example to get correct <id>, <num> and <ipv6_prefix>
+    
+    # For <id>:
+    # Use the same ID as you chose earlier with command: sh flash_border_router.sh <board-id>
+
+    #For <num>:
+    user@grenoble.iot-lab.info:~$ ip addr show | grep tap
+    313: tap0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+    316: tap1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+    582: tap8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+
+    #For <ipv6_prefix>
+    user@grenoble.iot-lab.info:~$ ip -6 route
+    2001:660:5307:3100::/64 via fe80::2 dev tap0 metric 1024 linkdown  pref medium
+    2001:660:5307:3102::/64 via fe80::2 dev tap2 metric 1024 linkdown  pref medium
+    2001:660:5307:3103::/64 via fe80::2 dev tap3 metric 1024 linkdown  pref medium
+    2001:660:5307:3104::/64 via fe80::2 dev tap4 metric 1024 linkdown  pref medium
+    2001:660:5307:3107::/64 via fe80::2 dev tap100 metric 1024 linkdown  pref medium
+    ...
+
+
+    ```
 
 a free tap <num> network interface
 
@@ -144,9 +175,7 @@ a free <ipv6_prefix> on the good site. For example the first one of Grenoble sit
 
 the good node's <id> for the border router
 
-    ```bash
-    sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
-    ```
+
 
 ## Usage
 
