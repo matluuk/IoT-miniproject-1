@@ -76,7 +76,6 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 2. Submit an experiment at grenoble for 20 minutes:
 
     ```bash
-    # Command returns the ID of both nodes, they are needed later!
     iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
     ```
 
@@ -89,6 +88,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 4. Get the experiment nodes list:
 
     ```bash
+    # Command returns the ID of both nodes, they are needed later!
     iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
     ```
 
@@ -109,8 +109,19 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 3. Run flash_border_router.sh after booking the experiment:
 
     ```bash
-    # <board-id> = Select one ID from section "Set up Fit IoT-Lab experiment" point 2.
     sh flash_border_router.sh <board-id>
+    ```
+
+    ```bash
+    # Example to get correct <board.id>
+
+    user@grenoble.iot-lab.info:~$ iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
+[
+    "m3-6.grenoble.iot-lab.info",
+    "m3-7.grenoble.iot-lab.info"
+]
+    # In this example <board-id> = "6" or "7"
+    # Only need to pick one ID!
     ```
 
 4. Check which tap interfaces are open:
