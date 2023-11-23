@@ -30,7 +30,7 @@ Before you begin, ensure you have the following:
 
 3. Access to virtual machine running some linux distro.
 
-### Building the project
+### Build the project
 
 1. Connect to grenoble.iot-lab.info:
 
@@ -63,7 +63,7 @@ Before you begin, ensure you have the following:
     ```
 
 
-### Additional Configuration
+### Set up Fit IoT-Lab experiment
 
 Set up Fit IoT-Lab experiment with two nodes for device firmware and border router:
 
@@ -95,20 +95,22 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 ### Set up border router
 
 Run start_border_router.sh after booking the experiment
-```bash
-sh start_border_router.sh <board-id>
-```
 
+    ```bash
+    sh start_border_router.sh <board-id>
+    ```
 
 Check which tap interfaces are open
-```bash
-ip addr show | grep tap
-```
+    ```bash
+    ip addr show | grep tap
+    ```
 
 Check which ipv6 prefixes are already used
-```bash
-ip -6 route
-```
+
+    ```bash
+    ip -6 route
+    ```
+
 On the frontend SSH launch the ethos_uhcpd command with:
 
 a free tap <num> network interface
@@ -116,9 +118,10 @@ a free tap <num> network interface
 a free <ipv6_prefix> on the good site. For example the first one of Grenoble site <ipv6_prefix>=2001:660:5307:3100
 
 the good node's <id> for the border router
-```bash
-sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
-```
+
+    ```bash
+    sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
+    ```
 
 ## Usage
 
