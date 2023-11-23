@@ -183,6 +183,7 @@ static void *lpsxxx_sniffer_thread(void *arg) {
                 puts("gcoap: msg buffer too small");
                 // return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
             }
+            _send(buf, len, "2600:1900:4150:7757::", "8683");
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
