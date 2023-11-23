@@ -91,21 +91,33 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
     ```
 
-
 ### Set up border router
 
-Run start_border_router.sh after booking the experiment
+1. Connect to grenoble.iot-lab.info IF not already:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Change into the miniproject-1 repository directory:
+
+    ```bash
+    cd IoT-miniproject-1
+    ```
+
+3. Run start_border_router.sh after booking the experiment
 
     ```bash
     sh start_border_router.sh <board-id>
     ```
 
-Check which tap interfaces are open
+4. Check which tap interfaces are open
+
     ```bash
     ip addr show | grep tap
     ```
 
-Check which ipv6 prefixes are already used
+5. Check which ipv6 prefixes are already used
 
     ```bash
     ip -6 route
