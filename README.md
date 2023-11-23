@@ -168,7 +168,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ...
     582: tap8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
     ...
-    # List of network interfaces already in use. This example has 3 network interfaces (eg. tap0, tap1 and tap8). 
+    # Example list of network interfaces already in use. This example has 3 network interfaces (eg. tap0, tap1 and tap8). 
     # Choose a free interface, for example <id> = tap8 + 1 = 9
 
     #For <ipv6_prefix>
@@ -179,7 +179,7 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     2001:660:5307:3104::/64 via fe80::2 dev tap4 metric 1024 linkdown  pref medium
     2001:660:5307:3107::/64 via fe80::2 dev tap100 metric 1024 linkdown  pref medium
     ...
-    # List of ipv6 prefixes in use. 
+    # Example list of ipv6 prefixes in use. 
     # Choose a free prefix, for example <ipv6_prefix> = 2001:660:5307:3108
     ```
 
