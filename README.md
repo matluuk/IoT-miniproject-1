@@ -34,7 +34,7 @@ Requirements to run the CoAp server in the linux virtual machine
 
 1. Create new python venv
 
-    [Link](https://docs.python.org/3/library/venv.html)
+    Follow guide at [Link](https://docs.python.org/3/library/venv.html)
 
 2. intall autoconf on linux 
 
