@@ -14,11 +14,11 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 /* Retain request path to re-request if response includes block. User must not
  * start a new request (with a new path) until any blockwise transfer
  * completes or times out. */
-#define _LAST_REQ_PATH_MAX (32)
-static char _last_req_path[_LAST_REQ_PATH_MAX];
+// #define _LAST_REQ_PATH_MAX (32)
+// static char _last_req_path[_LAST_REQ_PATH_MAX];
 
-static char addr_str[] = "2600:1900:4150:7757::";
-static char port_str[] = "8683";
+static char set_addr[] = "2600:1900:4150:7757::";
+static char set_port[] = "8683";
 
 /* Counts requests sent by CLI. */
 static uint16_t req_count = 0;
@@ -122,12 +122,13 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
-int gcoap_cli_cmd(char method, uint8_t * buf[CONFIG_GCOAP_PDU_BUF_SIZE])
+int gcoap_cli_cmd(char method[], char *data)
 {
     // Only acceptable methods are shown below
     char *method_codes[] = {"get", "post", "put"};
     coap_pkt_t pdu;
     size_t len;
+    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 
     int code_pos = -1;
     for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
@@ -136,16 +137,21 @@ int gcoap_cli_cmd(char method, uint8_t * buf[CONFIG_GCOAP_PDU_BUF_SIZE])
         }
     }
     if (code_pos == -1) {
-        goto end;
+        return 0;
     }
 
-    gcoap_req_init(&pdu, buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
+    gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
     coap_hdr_set_type(pdu.hdr, COAP_TYPE_NON);
     coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
 
+    gcoap_resp_init(&pdu, buf, len, COAP_CODE_CONTENT);
+
+    memcpy(&pdu.payload, data, strlen(data));
+
     
-    if (_send(buf[0], len, &addr_str, &port_str) == 0) {
+    if (_send(&buf[0], len, set_addr, set_port) == 0) {
         puts("gcoap_cli: msg send failed");
     }
+    return 1;
 }
