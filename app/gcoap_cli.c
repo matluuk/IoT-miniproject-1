@@ -17,6 +17,9 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 #define _LAST_REQ_PATH_MAX (32)
 static char _last_req_path[_LAST_REQ_PATH_MAX];
 
+static char addr_str[] = "2600:1900:4150:7757::";
+static char port_str[] = "8683";
+
 /* Counts requests sent by CLI. */
 static uint16_t req_count = 0;
 
@@ -64,31 +67,6 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
     else {
         printf(", empty payload\n");
-    }
-
-    /* ask for next block if present */
-    if (coap_get_block2(pdu, &block)) {
-        if (block.more) {
-            unsigned msg_type = coap_get_type(pdu);
-            if (block.blknum == 0 && !strlen(_last_req_path)) {
-                puts("Path too long; can't complete blockwise");
-                return;
-            }
-
-            gcoap_req_init(pdu, (uint8_t *)pdu->hdr, CONFIG_GCOAP_PDU_BUF_SIZE,
-                           COAP_METHOD_GET, _last_req_path);
-            if (msg_type == COAP_TYPE_ACK) {
-                coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
-            }
-            block.blknum++;
-            coap_opt_add_block2_control(pdu, &block);
-            int len = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
-            gcoap_req_send((uint8_t *)pdu->hdr, len, remote,
-                           _resp_handler, memo->context);
-        }
-        else {
-            puts("--- blockwise complete ---");
-        }
     }
 }
 
@@ -144,11 +122,10 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
-int gcoap_cli_cmd(char method)
+int gcoap_cli_cmd(char method, uint8_t * buf[CONFIG_GCOAP_PDU_BUF_SIZE])
 {
     // Only acceptable methods are shown below
     char *method_codes[] = {"get", "post", "put"};
-    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
     size_t len;
 
@@ -162,59 +139,13 @@ int gcoap_cli_cmd(char method)
         goto end;
     }
 
-    gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos+1, NULL);
+    gcoap_req_init(&pdu, buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
     coap_hdr_set_type(pdu.hdr, COAP_TYPE_NON);
-    coap_opt_add_
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
 
-
-    /*
-     * "get" (code_pos 0) must have exactly apos + 3 arguments
-     * while "post" (code_pos 1) and "put" (code_pos 2) and must have exactly
-     * apos + 4 arguments
-     */
-    if (((argc == apos + 3) && (code_pos == 0)) ||
-        ((argc == apos + 4) && (code_pos != 0))) {
-        gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos+1, argv[apos+2]);
-        coap_hdr_set_type(pdu.hdr, msg_type);
-
-        memset(_last_req_path, 0, _LAST_REQ_PATH_MAX);
-        if (strlen(argv[apos+2]) < _LAST_REQ_PATH_MAX) {
-            memcpy(_last_req_path, argv[apos+2], strlen(argv[apos+2]));
-        }
-
-        size_t paylen = (argc == apos + 4) ? strlen(argv[apos+3]) : 0;
-        if (paylen) {
-            coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
-            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
-            if (pdu.payload_len >= paylen) {
-                memcpy(pdu.payload, argv[apos+3], paylen);
-                len += paylen;
-            }
-            else {
-                puts("gcoap_cli: msg buffer too small");
-                return 1;
-            }
-        }
-        else {
-            len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
-        }
-
-        printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
-               (unsigned) len);
-        if (!_send(&buf[0], len, argv[apos], argv[apos+1])) {
-            puts("gcoap_cli: msg send failed");
-        }
-        return 0;
+    
+    if (_send(buf[0], len, &addr_str, &port_str) == 0) {
+        puts("gcoap_cli: msg send failed");
     }
-    else {
-        printf("usage: %s <get|post|put> [-c] <addr>[%%iface] <port> <path> [data]\n",
-               argv[0]);
-        printf("Options\n");
-        printf("    -c  Send confirmably (defaults to non-confirmable)\n");
-        return 1;
-    }
-
-    end:
-    printf("usage: %s <get|post|put|info>\n", argv[0]);
-    return 1;
 }

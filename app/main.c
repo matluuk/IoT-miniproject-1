@@ -23,8 +23,6 @@ static char lpsxxx_sniffer_stack[THREAD_STACKSIZE_MAIN];
 // Thread pid variable
 static kernel_pid_t main_pid, lpsxxx_read_pid, lpsxxx_sniffer_pid;
 
-extern size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str);
-
 //The struct used to handle the temperature and mutex
 typedef struct {
     uint16_t temperature;
@@ -159,8 +157,8 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
-            
-            uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
+
+            uint8_t * buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 
             // Datan lähetys serverille
             char response[32];
@@ -168,8 +166,9 @@ static void *lpsxxx_sniffer_thread(void *arg) {
             int temp_abs = data.temperature / 100;
             temp -= temp_abs * 100;
             sprintf(response, "%2i.%02i",temp_abs, temp);
+            buf[0] = &response;
 
-            _send(&buf[0], sizeof(response), "2600:1900:4150:7757::", "8683");
+            gcoap_cli_cmd("post", buf);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
