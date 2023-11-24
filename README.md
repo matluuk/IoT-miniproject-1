@@ -127,7 +127,7 @@ To use this project, follow these guidelines:
 1. Flash the firmware into the experiment node:
 
     ```bash
-    make IOTLAB_NODE=auto flash
+    make IOTLAB_NODE=m3-114 DEFAULT_CHANNEL=18 DEFAULT_PAN_ID=0xbcb4 flash 
     ```
 
 ### Free up resources:

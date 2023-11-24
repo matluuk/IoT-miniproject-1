@@ -36,6 +36,9 @@ static data_t data;
 uint32_t lpsxxx_sleep = 30;
 uint32_t lpsxxx_sniffer_sleep = 30;
 
+// message queue for main thread
+#define MAIN_QUEUE_SIZE (4)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /**
  * @brief Handles temperature readings from the LPSXXX sensor.
@@ -216,6 +219,8 @@ int main(void) {
                     lpsxxx_sniffer_thread,
                     NULL,
                     "lpsxxx sniffer thread");
+
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     // Start the shell
     char line_buf[SHELL_DEFAULT_BUFSIZE];
