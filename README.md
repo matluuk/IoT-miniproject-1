@@ -94,9 +94,13 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 
 ### Set up border router
 
-Run start_border_router.sh after booking the experiment
+Run command above to flash border router after booking the experiment.
 ```bash
-sh start_border_router.sh <board-id>
+sh flash_border_router.sh <board-id>
+```
+
+```bash
+sh flash_client.sh <board-id>
 ```
 
 
