@@ -122,7 +122,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
-int gcoap_cli_cmd(char method[], char *data)
+int gcoap_access(char method[], char *data)
 {
     // Only acceptable methods are shown below
     char *method_codes[] = {"get", "post", "put"};

@@ -10,6 +10,6 @@
 
 #include "debug.h"
 
-int gcoap_cli_cmd(char method[], char *data);
+int gcoap_access(char method[], char *data);
 
 #endif
