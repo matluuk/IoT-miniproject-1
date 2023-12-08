@@ -23,13 +23,13 @@ class TemperatureResource(resource.Resource):
     def set_content(self, content):
         self.content = content
 
-    async def render_post(self, request):
-        print('PUT payload: %s' % request.payload) #TODO: Change to logger
+    async def render_put(self, request):
+        print('PUT payload: %s' % request.payload)
         self.set_content(request.payload)
         temperature = request.payload # .decode()
         write_temperature_to_file(temperature)
         
-        return aiocoap.Message(code=aiocoap.CHANGED, payload=self.content)
+        return aiocoap.Message(code=aiocoap.CHANGED)
 
 def set_logger():
     logs_dir = os.path.join(Path(__file__).resolve().parent, "logs")
