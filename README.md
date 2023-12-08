@@ -215,9 +215,38 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 
 7. After launching ethos_uhcpd, leave the script running!
 
+## Set up server 
+
+For coap server a linux virtual machine is needed. 
+
+Requirements for the virtual machine:
+- Ubuntu 20.04
+- external IPV6 address for connecting with iot-lab nodes
+- coap port 8683 open for ingress traffic
+- ICMPv6 traffic allowed for testing ping
+
+Any linux virtual machine should work, but we walk through how to set up Google Cloud virtual machine. Google cloud has a free trial with 300$ credits to use. The virtual machine needs a external IPV6 ip address for connection with the iot-lab node. 
+
+### Create VPC (Virtual Private Cloud)
+
+To get external ipv6 address, Virtual Private Cloud is needed.
+
+
+
+### Create google cloud VM
+
+Create Google Cloud account. You need a credit card for google cloud account in order to use the free tier.
+
+https://console.cloud.google.com/?hl=en&_ga=2.87814171.-2055644655.1699615458&_gac=1.116033140.1702051941.CjwKCAiAmsurBhBvEiwA6e-WPIQOg4lsX1QJevny4vxo9FBotFtCxOCFgTHR5MXrhSOSkf66HEamdRoCthsQAvD_BwE
+
+To create a google cloud VM go to 
+
+https://console.cloud.google.com/compute/instances?_ga=2.181990823.1219151963.1702027579-2055644655.1699615458
+
+Press Create new instance
+![Alt text](images/1.png)
+
 ### Set up CoAP server
-
-
 
 ## Usage
 
