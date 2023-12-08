@@ -122,7 +122,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
-int gcoap_access(char method[], char *data)
+int gcoap_access(char method[], char *data, char *resource)
 {
     // Only acceptable methods are shown below
     char *method_codes[] = {"get", "post", "put"};
@@ -140,16 +140,15 @@ int gcoap_access(char method[], char *data)
         return 0;
     }
 
-    gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos, NULL);
+    gcoap_req_init(&pdu, &buf[0], CONFIG_GCOAP_PDU_BUF_SIZE, code_pos + 1, resource);
     coap_hdr_set_type(pdu.hdr, COAP_TYPE_NON);
     coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    gcoap_resp_init(&pdu, buf, len, COAP_CODE_CONTENT);
+    memcpy(pdu.payload, data, strlen(data));
 
-    memcpy(&pdu.payload, data, strlen(data));
-
-    
+    printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
+               (unsigned) len);
     if (_send(&buf[0], len, set_addr, set_port) == 0) {
         puts("gcoap_cli: msg send failed");
     }
