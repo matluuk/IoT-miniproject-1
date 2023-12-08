@@ -78,21 +78,21 @@ static int lpsxxx_handler(void){
  *
  * @return 1 if the tens place has changed, 0 otherwise.
  */
-// static int compareTo_LastSent(void){
+static int compareTo_LastSent(void){
 
-//     // Extract the tens place from data.temperature_last_sent
-//     int16_t last_sent_tens = (data.temperature_last_sent / 10) % 10;
+    // Extract the tens place from data.temperature_last_sent
+    int16_t last_sent_tens = (data.temperature_last_sent / 10) % 10;
 
-//     // Extract the tens place from data.temperature
-//     int16_t current_tens = (data.temperature / 10) % 10;
+    // Extract the tens place from data.temperature
+    int16_t current_tens = (data.temperature / 10) % 10;
 
-//     // Check if the tens place has changed
-//     if (current_tens != last_sent_tens) {
-//         return 1; // Value has changed
-//     } else {
-//         return 0; // Value has not changed
-//     }
-// }
+    // Check if the tens place has changed
+    if (current_tens != last_sent_tens) {
+        return 1; // Value has changed
+    } else {
+        return 0; // Value has not changed
+    }
+}
 
 
 /**
@@ -136,7 +136,7 @@ static void *lpsxxx_read_thread(void *arg){
  *
  * This thread monitors changes in the temperature data by periodically comparing
  * the current temperature with the last sent temperature. If a change is detected,
- * TÄHÄN LISÄÄ!!!!!.
+ * TODO: TÄHÄN LISÄÄ!!!!!.
  *
  * @param arg Unused argument (may be NULL).
  * @return NULL (not used in this context).
@@ -158,8 +158,7 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         mutex_lock(&data.lock);
 
         // Compare the current temperature with the last sent temperature
-        // if (compareTo_LastSent() == 1) {
-        if (true) {
+        if (compareTo_LastSent() == 1) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
 
             // Datan lähetys serverille
@@ -170,7 +169,7 @@ static void *lpsxxx_sniffer_thread(void *arg) {
             temp -= temp_abs * 100;
             sprintf(response, "%2i.%2i", temp_abs, temp);
 
-            gcoap_cli_send("put", &response[0], &resource[0]);
+            gcoap_access("put", &response[0], &resource[0]);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
