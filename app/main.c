@@ -9,6 +9,11 @@
 #include "mutex.h"
 #include "lpsxxx.h"
 #include "lpsxxx_params.h"
+#include "msg.h"
+
+#include "net/gcoap.h"
+#include "fmt.h"
+#include "gcoap_cli.h"
 
 // The lps331ap device variable and stack
 static lpsxxx_t lpsxxx;
@@ -31,6 +36,9 @@ static data_t data;
 uint32_t lpsxxx_sleep = 30;
 uint32_t lpsxxx_sniffer_sleep = 30;
 
+// message queue for main thread
+#define MAIN_QUEUE_SIZE (4)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /**
  * @brief Handles temperature readings from the LPSXXX sensor.
@@ -128,7 +136,7 @@ static void *lpsxxx_read_thread(void *arg){
  *
  * This thread monitors changes in the temperature data by periodically comparing
  * the current temperature with the last sent temperature. If a change is detected,
- * TÄHÄN LISÄÄ!!!!!.
+ * TODO: TÄHÄN LISÄÄ!!!!!.
  *
  * @param arg Unused argument (may be NULL).
  * @return NULL (not used in this context).
@@ -152,6 +160,16 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
+
+            // Datan lähetys serverille
+            char response[5];
+            char resource[] = "/temperature";
+            uint16_t temp = data.temperature;
+            int temp_abs = data.temperature / 100;
+            temp -= temp_abs * 100;
+            sprintf(response, "%2i.%2i", temp_abs, temp);
+
+            gcoap_access("put", &response[0], &resource[0]);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
@@ -202,6 +220,8 @@ int main(void) {
                     lpsxxx_sniffer_thread,
                     NULL,
                     "lpsxxx sniffer thread");
+
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     // Start the shell
     char line_buf[SHELL_DEFAULT_BUFSIZE];
