@@ -146,6 +146,7 @@ int gcoap_access(char method[], char *data, char *resource)
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
 
     memcpy(pdu.payload, data, strlen(data));
+    len += strlen(data);
 
     printf("gcoap_cli: sending msg ID %u, %u bytes\n", coap_get_id(&pdu),
                (unsigned) len);

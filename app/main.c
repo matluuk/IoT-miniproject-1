@@ -163,13 +163,14 @@ static void *lpsxxx_sniffer_thread(void *arg) {
             printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
 
             // Datan lähetys serverille
-            char response[32];
+            char response[5];
+            char resource[] = "/temperature";
             uint16_t temp = data.temperature;
             int temp_abs = data.temperature / 100;
             temp -= temp_abs * 100;
-            sprintf(response, "%2i.%02i",temp_abs, temp);
+            sprintf(response, "%2i.%2i", temp_abs, temp);
 
-            gcoap_access("put", &response[0], "/temperature");
+            gcoap_access("put", &response[0], &resource[0]);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
