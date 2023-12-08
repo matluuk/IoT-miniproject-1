@@ -10,7 +10,7 @@ import aiocoap
 
 from pathlib import Path
 
-IP_ADRESS = "127.0.0.1"
+IP_ADRESS = "2600:1900:4150:7757:0:0:0:0"
 port = 8683
 
 class Welcome(resource.Resource):
