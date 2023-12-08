@@ -11,21 +11,14 @@
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote);
 
-/* Retain request path to re-request if response includes block. User must not
- * start a new request (with a new path) until any blockwise transfer
- * completes or times out. */
-// #define _LAST_REQ_PATH_MAX (32)
-// static char _last_req_path[_LAST_REQ_PATH_MAX];
-
+// Set address and port for the server
 static char set_addr[] = "2600:1900:4150:7757::";
 static char set_port[] = "8683";
 
-/* Counts requests sent by CLI. */
+// Counts requests sent by CLI
 static uint16_t req_count = 0;
 
-/*
- * Response callback.
- */
+// Response handler
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote)
 {
@@ -122,7 +115,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     return bytes_sent;
 }
 
-int gcoap_access(char method[], char *data, char *resource)
+int gcoap_cli_send(char method[], char *data, char *resource)
 {
     // Only acceptable methods are shown below
     char *method_codes[] = {"get", "post", "put"};
@@ -130,6 +123,7 @@ int gcoap_access(char method[], char *data, char *resource)
     size_t len;
     uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 
+    // Check if method is one in method_codes
     int code_pos = -1;
     for (size_t i = 0; i < ARRAY_SIZE(method_codes); i++) {
         if (strcmp(method, method_codes[i]) == 0) {

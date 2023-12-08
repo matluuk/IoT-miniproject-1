@@ -170,7 +170,7 @@ static void *lpsxxx_sniffer_thread(void *arg) {
             temp -= temp_abs * 100;
             sprintf(response, "%2i.%2i", temp_abs, temp);
 
-            gcoap_access("put", &response[0], &resource[0]);
+            gcoap_cli_send("post", &response[0], &resource[0]);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
