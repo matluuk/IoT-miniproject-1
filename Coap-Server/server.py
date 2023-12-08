@@ -10,7 +10,8 @@ import aiocoap
 
 from pathlib import Path
 
-IP_ADRESS = "2600:1900:4150:7757:0:0:0:0"
+IP_ADRESS = "127.0.0.1"
+port = 8683
 
 class Welcome(resource.Resource):
     representations = {
@@ -196,7 +197,7 @@ async def main():
     root.add_resource(['temperature'], TemperatureResource())
     root.add_resource(['whoami'], WhoAmI())
 
-    await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, None))
+    await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, port))
     # await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, None), transports=["udp6"])
 
     # Run forever
