@@ -70,11 +70,11 @@ static int lpsxxx_handler(void){
 
 
 /**
- * @brief Compare tens place of current temperature with the last sent temperature.
+ * @brief Compare tenths place of current temperature with the last sent temperature.
  *
  * This function extracts the tens place from both the current temperature
- * and the last sent temperature. It then compares the tens places to determine
- * if there has been a change.
+ * and the last sent temperature. It then compares the tenths places to determine
+ * if there has been a significant change.
  *
  * @return 1 if the tens place has changed, 0 otherwise.
  */

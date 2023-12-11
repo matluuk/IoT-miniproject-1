@@ -116,6 +116,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
 
     bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler, NULL);
     if (resp_error == 1) {
+        resp_error = 0;
         return 0;
     }
     if (bytes_sent > 0) {
