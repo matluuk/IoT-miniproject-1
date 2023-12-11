@@ -18,6 +18,10 @@ static char set_port[] = "8683";
 // Counts requests sent by CLI
 static uint16_t req_count = 0;
 
+// Variable for indicating error
+uint8_t resp_error = 0;
+
+
 // Response handler
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote)
@@ -26,10 +30,12 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
+        resp_error = 1;
         return;
     }
     else if (memo->state == GCOAP_MEMO_ERR) {
         printf("gcoap: error in response\n");
+        resp_error = 1;
         return;
     }
 
@@ -109,6 +115,9 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     }
 
     bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler, NULL);
+    if (resp_error == 1) {
+        return 0;
+    }
     if (bytes_sent > 0) {
         req_count++;
     }
@@ -130,6 +139,7 @@ int gcoap_cli_send(char method[], char *data, char *resource)
             code_pos = i;
         }
     }
+    // Onko turha? Methodi kovakoodattu.
     if (code_pos == -1) {
         return 0;
     }
@@ -146,6 +156,7 @@ int gcoap_cli_send(char method[], char *data, char *resource)
                (unsigned) len);
     if (_send(&buf[0], len, set_addr, set_port) == 0) {
         puts("gcoap_cli: msg send failed");
+        return 0;
     }
     return 1;
 }

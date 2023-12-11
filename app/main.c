@@ -36,7 +36,7 @@ static data_t data;
 uint32_t lpsxxx_sleep = 30;
 uint32_t lpsxxx_sniffer_sleep = 30;
 
-// message queue for main thread
+// Message queue for main thread
 #define MAIN_QUEUE_SIZE (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
@@ -119,7 +119,7 @@ static void *lpsxxx_read_thread(void *arg){
         if(lpsxxx_handler() != 0){
             printf("lpsxxx_handler failed!");
         }
-        printf("Temperature: %i\n", data.temperature);
+        printf("Temperature: %i\n", data.temperature);  // Poistetaan viimeisimmästä versiosta!!         
         // Release the data lock after processing
         mutex_unlock(&data.lock);
 
@@ -135,8 +135,9 @@ static void *lpsxxx_read_thread(void *arg){
  * @brief Thread function for monitoring changes in the temperature and detecting updates.
  *
  * This thread monitors changes in the temperature data by periodically comparing
- * the current temperature with the last sent temperature. If a change is detected,
- * TODO: TÄHÄN LISÄÄ!!!!!.
+ * the current temperature with the last sent temperature. if a significant change is detected, 
+ * sends the updated temperature data to a server.
+ * If transmission fails, the functions tries to resend the data for maximum of 5 times.
  *
  * @param arg Unused argument (may be NULL).
  * @return NULL (not used in this context).
@@ -159,18 +160,29 @@ static void *lpsxxx_sniffer_thread(void *arg) {
 
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
-            printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
+            printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);   // Poistetaan viimeisimmästä versiosta!!   
 
-            // Datan lähetys serverille
+            // Sending data to server
             char response[5];
             char resource[] = "/temperature";
             uint16_t temp = data.temperature;
             int temp_abs = data.temperature / 100;
             temp -= temp_abs * 100;
-            sprintf(response, "%2i.%2i", temp_abs, temp);
+            sprintf(response, "%2i.%2i", temp_abs, temp);   
 
-            gcoap_access("put", &response[0], &resource[0]);
-            data.temperature_last_sent = data.temperature;
+            // If sending fails -> resend max 5 times
+            for(uint8_t x = 1; x <6; x++){
+                if(gcoap_cli_send("put", &response[0], &resource[0]) == 0){
+                    printf("Resending the temperature %i/5\n", x);
+                    continue;
+                }
+                else{
+                    // Update last sent data
+                    data.temperature_last_sent = data.temperature;
+                    break;
+                }
+                printf("Resending failed! Good luck next time\n");
+            }
         } else {
             printf("Value has not changed!\n");
         }
@@ -185,6 +197,25 @@ static void *lpsxxx_sniffer_thread(void *arg) {
 
 
 /**
+ * @brief Prints the startup information for the program.
+ */
+void printStartupInfo(void) {
+
+    printf("==================================================================\n");
+    printf("                     Internet of Things 2023\n");                   
+    printf("                          Miniproject 1\n");
+    printf("------------------------------------------------------------------\n");
+    printf("                            Welcome!\n\n");
+    printf("This program reads temperature from IoT-Lab M3 MCU and sends the\n");
+    printf("data to backend cloud server using CoAP protocol\n");
+    printf("------------------------------------------------------------------\n");
+    printf("Documentation: https://github.com/matluuk/IoT-miniproject-1\n");
+    printf("Developed by: Matti Luukkonen, Touko Kinnunen and Hermanni Hanhela\n");
+    printf("==================================================================\n");
+}
+
+
+/**
  * @brief Main function for the application.
  *
  * This function initializes the necessary components, creates threads for
@@ -193,6 +224,8 @@ static void *lpsxxx_sniffer_thread(void *arg) {
  * @return 0 on successful execution (Note: The return statement is not used in this context).
  */
 int main(void) {
+
+    printStartupInfo();
 
     // Initialize the xtimer module
     xtimer_init();
