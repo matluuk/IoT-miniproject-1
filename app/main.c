@@ -10,7 +10,6 @@
 #include "lpsxxx.h"
 #include "lpsxxx_params.h"
 #include "msg.h"
-
 #include "net/gcoap.h"
 #include "fmt.h"
 #include "gcoap_cli.h"
@@ -39,6 +38,7 @@ uint32_t lpsxxx_sniffer_sleep = 30;
 // Message queue for main thread
 #define MAIN_QUEUE_SIZE (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
 
 /**
  * @brief Handles temperature readings from the LPSXXX sensor.
@@ -186,11 +186,9 @@ static void *lpsxxx_sniffer_thread(void *arg) {
         } else {
             printf("Value has not changed!\n");
         }
-
         // Release the data lock after processing
         mutex_unlock(&data.lock);
     }
-
     // This return statement is not reached in this context
     return NULL;
 }

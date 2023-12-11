@@ -21,7 +21,6 @@ static uint16_t req_count = 0;
 // Variable for indicating error
 uint8_t resp_error = 0;
 
-
 // Response handler
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote)
