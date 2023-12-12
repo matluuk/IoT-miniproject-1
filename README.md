@@ -28,8 +28,6 @@ Before you begin, ensure you have the following:
 
 2. SSH connection to grenoble.iot-lab.info
 
-3. Access to virtual machine running some linux distro to run CoAP server.
-
 ### Build the project
 
 1. Connect to grenoble.iot-lab.info:
