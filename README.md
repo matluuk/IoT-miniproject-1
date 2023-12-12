@@ -393,27 +393,32 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
     sh start_server.sh ip=<external-ipv6-address-of-the-VM> port=8683
     ```
 
-The `start_server.sh` uses nohup to start the server. Press `enter` to go back to console. Server are now running on the background and can be stopped using the `stop_server.sh` script.
+The `start_server.sh` uses nohup to start the server. Press `enter` to go back to console. 
+
+Server are now running on the background and can be stopped using the `stop_server.sh` script.
 ```bash
 sh stop_server.sh
 ```
 #### **LOGS**
 
-The CoAp server saves logs of every session under `logs` folder. To take a look on the log created. 
+The CoAp server saves logs of every session to `logs` folder. To take a look on the log created. 
 1. Go to the `logs` folder:
     ```bash
     cd logs
     ```
 
-2. This command can be used to show the logs in real time.
+2. The `tail` command can be used to show the logs in real time.
     ```bash
     tail -f ./<name-of-the-lates-log-file>.log
     ```
 #### **DATA**
 
-The temperature data is stored in files under data folder. Temperature data of every day is saved to it's own file. Notice that the data folder is created, when the first temperature vaule is received.
+The temperature data is stored in files under data folder. One file is made for each day, when temperature datais received. Notice that the data folder is created, when the first temperature vaule is received.
 
-
+* The temperature data can be shown using the `tail` command.
+    ```bash
+    tail -f ./<name-of-the-lates-data-file>.txt
+    ```
 
 ## Usage
 
