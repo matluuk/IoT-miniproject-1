@@ -30,36 +30,6 @@ Before you begin, ensure you have the following:
 
 3. Access to virtual machine running some linux distro to run CoAP server.
 
-Requirements to run the CoAp server in the linux virtual machine
-
-1. Create new python venv
-
-    Follow guide at [Link](https://docs.python.org/3/library/venv.html)
-
-2. intall autoconf on linux 
-
-    ```bash
-    sudo apt-get install autoconf
-    ```
-
-3. install python-dev for 
-
-    ```bash
-    sudo apt-get install python-dev-is-python3 -y
-    ```
-
-4. install build-essential
-
-    ```bash
-    sudo apt-get install build-essential
-    ```
-
-5. intall aiocoap to python venv
-
-    ```bash
-    pip3 install --upgrade "aiocoap[all]"
-    ```
-
 ### Build the project
 
 1. Connect to grenoble.iot-lab.info:
@@ -227,26 +197,179 @@ Requirements for the virtual machine:
 
 Any linux virtual machine should work, but we walk through how to set up Google Cloud virtual machine. Google cloud has a free trial with 300$ credits to use. The virtual machine needs a external IPV6 ip address for connection with the iot-lab node. 
 
-### Create VPC (Virtual Private Cloud)
+### Set up Google cloud VM
 
-To get external ipv6 address, Virtual Private Cloud is needed.
-
-
-
-### Create google cloud VM
-
-Create Google Cloud account. You need a credit card for google cloud account in order to use the free tier.
+Google Cloud account is needed for using google Cloud services. At the time being, 300 credits can be obtained for use in 3 months time period for free. Below are a link to where a google cloud account can be created.
 
 https://console.cloud.google.com/?hl=en&_ga=2.87814171.-2055644655.1699615458&_gac=1.116033140.1702051941.CjwKCAiAmsurBhBvEiwA6e-WPIQOg4lsX1QJevny4vxo9FBotFtCxOCFgTHR5MXrhSOSkf66HEamdRoCthsQAvD_BwE
 
-To create a google cloud VM go to 
+#### Create Virtual private cloud
 
-https://console.cloud.google.com/compute/instances?_ga=2.181990823.1219151963.1702027579-2055644655.1699615458
+Next step is to create vpc (virtual private cloud) for the VM. This is necessary to bget the external ipv6 address for the VM. The VPC:s can be managed at following google cloud console site.
 
-Press Create new instance
-![Alt text](images/1.png)
+https://console.cloud.google.com/networking/networks?hl=en&_ga=2.16771894.-1464318792.1699625730&_gac=1.195093086.1701470264.CjwKCAiApaarBhB7EiwAYiMwqnFJQWu6iGIMccKLYWIfXNoxHQGC0UXqAEzLXMDN3NWpUHO9M_Fa9RoC834QAvD_BwE
 
-### Set up CoAP server
+VPC can be created by pressing the `CREATE VPC NETWORK` button on the top bar.
+
+![CREATE VPC NETWORK](images/createVpcNetwork.png)
+
+Below are all the setting I used to create the VPC.
+
+<details><summary>VPC settings</summary>
+
+![VPC settings 1](images/vpcsettings1.png)
+
+![VPC settings 2](images/vpcsettings2.png)
+
+Select all these firewall rules for both ipv4 and ipv6!
+
+![VPC settings 3](images/vpcsettings3.png)
+
+![VPC settings 4](images/vpcsettings4.png)
+
+</details>
+
+#### Firewall rules
+
+Firewall rules are a set of instructions that control how a firewall device handles incoming and outgoing traffic. They are access control mechanisms that enforce security in networks by blocking or allowing communication based on predetermined criteria. 
+
+Firewall rules can be managed at Google Cloud firewall rules website: 
+
+https://console.cloud.google.com/net-security/firewall-manager/firewall-policies
+
+For the coap server, a firewall rule that allows udp traffic on CoAp port 8683 must be created.
+This rule can be created by clicking the `CREATE FIREWALL RULE` button and using the following settings: 
+
+![CREATE FIREWALL RULE](images/createFirewallRule.png)
+
+<details><summary>Firewall rule: allow udp 8683</summary>
+
+![Firewall rule CoAp 1](images/firewallCoap1.png)
+
+![Firewall rule CoAp 2](images/firewallCoap2.png)
+
+</details>
+
+If you have followd according to this tutorial, you should have these firewall rules for the newly created VPC. Notice, wtät there are also some firewall rules for default VPC.
+
+![Firewall rules](images/firewallrules.png)
+
+If the firewall rules of your VPC are similar, you can continue.
+
+#### Create Virtual machine
+
+The Virtual machine is used to deploy the Coap server. Google cloud VM:s can be managed from the Google Cloud console instances website.
+
+https://console.cloud.google.com/compute/instances
+
+Click the `CREATE INSTANCE` button. And change the settings mentioned on the dropdown below.
+
+![Alt text](images/createinstance.png)
+
+<details><summary>VM instance settings</summary>
+
+Notice! It is important that the VM region is the same as the VPC subnet region.
+For the machine type I have chosen the e2-small. This have been enough for the CoAp server.
+
+![VM instance settings 1](images/VMinstance1.png)
+
+The linux image should be changed to Ubuntu 20.04 under `Boot Disk`
+
+![VM instance settings 2](images/VMinstance2.png)
+
+Under Advanced options the Networking settings must be changed. 
+
+1. Change the Network interface from default to the newly created VPC. 
+2. The subnetwork should be automatically selected to the one that you created.
+3. Select the `IP stack type` to be IPv4 and IPv6 (dual-stack)
+
+![VM instance settings 3](images/VMinstance3.png)
+</details>
+
+Now everything should be properly set up and the VM instance can be created.
+
+The SSH connection to the VM instance can be made by clicking the SSH button under Connect. This creates new window with the ssh connection.
+
+![SSH to VM](images/sshToVM.png)
+
+### Set up CoAP server to VM
+
+Connect to the linux VM, where you want the the CoAp server to be deployed.
+
+Install all the dependencies and set up the python3 virtual environment.
+
+1. Clone the repository to your folder of choise:
+
+    ```bash
+    git clone https://github.com/matluuk/IoT-miniproject-1.git
+    ```
+
+2. update apt-get
+    ```bash
+    sudo apt-get update
+    ```
+
+3. install python3.8-venv
+    ```bash
+    sudo apt install python3.8-venv
+    ```
+
+4. Create and activate new python venv
+
+    ```bash
+    python3 -m venv ./CoaP-server-venv
+    ```
+    ```bash
+    source ./CoaP-server-venv/bin/activate
+    ```
+
+5. intall autoconf on linux 
+
+    ```bash
+    sudo apt-get install autoconf
+    ```
+
+6. install python-dev for 
+
+    ```bash
+    sudo apt-get install python-dev-is-python3 -y
+    ```
+
+7. install build-essential
+
+    ```bash
+    sudo apt-get install build-essential
+    ```
+
+8. intall aiocoap to python venv
+
+    ```bash
+    pip3 install --upgrade "aiocoap[all]"
+    ```
+Now the CoAp server can be started
+
+1. move to the Coap server directory
+    ```bash
+    cd IoT-miniproject-1/Coap-Server/
+    ```
+
+2. Start the CoAp server
+    ```bash
+    sh start_server.sh ip=<external-ip-address-of-the-VM>
+    ```
+
+The `start_server.sh` uses nohup to start the server. Press `enter` to go back to console. Server are now running on the background.
+
+The CoAp server saves logs of every session under `logs` folder. To take a look on the log created. 
+1. Go to the `logs` folder:
+    ```bash
+    cd logs
+    ```
+
+2. This command can be used to show the logs in real time.
+    ```bash
+    tail -f ./<name-of-the-lates-log-file>.log
+    ```
 
 ## Usage
 
