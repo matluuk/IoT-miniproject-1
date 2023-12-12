@@ -296,7 +296,7 @@ The SSH connection to the VM instance can be made by clicking the SSH button und
 
 Connect to the linux VM, where you want the the CoAp server to be deployed.
 
-Install all the dependencies and set up the python3 virtual environment.
+#### **Install all the dependencies and set up the python3 virtual environment.**
 
 1. Clone the repository to your folder of choise:
 
@@ -346,19 +346,23 @@ Install all the dependencies and set up the python3 virtual environment.
     ```bash
     pip3 install --upgrade "aiocoap[all]"
     ```
-Now the CoAp server can be started
+#### **Start the CoAp server**
 
 1. move to the Coap server directory
     ```bash
     cd IoT-miniproject-1/Coap-Server/
     ```
 
-2. Start the CoAp server
+2. Start the CoAp server using oyur external ipv6 address and port 8683
     ```bash
-    sh start_server.sh ip=<external-ip-address-of-the-VM>
+    sh start_server.sh ip=<external-ipv6-address-of-the-VM> port=8683
     ```
 
-The `start_server.sh` uses nohup to start the server. Press `enter` to go back to console. Server are now running on the background.
+The `start_server.sh` uses nohup to start the server. Press `enter` to go back to console. Server are now running on the background and can be stopped using the `stop_server.sh` script.
+```bash
+sh stop_server.sh
+```
+#### **LOGS**
 
 The CoAp server saves logs of every session under `logs` folder. To take a look on the log created. 
 1. Go to the `logs` folder:
@@ -370,6 +374,11 @@ The CoAp server saves logs of every session under `logs` folder. To take a look 
     ```bash
     tail -f ./<name-of-the-lates-log-file>.log
     ```
+#### **DATA**
+
+The temperature data is stored in files under data folder. Temperature data of every day is saved to it's own file. Notice that the data folder is created, when the first temperature vaule is received.
+
+
 
 ## Usage
 
