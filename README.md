@@ -304,54 +304,58 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
     git clone https://github.com/matluuk/IoT-miniproject-1.git
     ```
 
-2. update apt-get
+2. move to the Coap server directory
+    ```bash
+    cd IoT-miniproject-1/Coap-Server/
+    ```
+
+3. update apt-get
     ```bash
     sudo apt-get update
     ```
 
-3. Create python venv
+4. Create python venv
 
-* install python3.8-venv
-    ```bash
-    sudo apt install python3.8-venv -y
-    ```
+    * install python3.8-venv
+        ```bash
+        sudo apt install python3.8-venv -y
+        ```
 
-* Create and activate new python venv
+    * Create the python venv 
+    
+    Notice - Use the start_server.sh script activates the venv automatically, so use exactly the same venv location and name
 
-    ```bash
-    python3 -m venv ./CoaP-server-venv
-    ```
-    ```bash
-    source ./CoaP-server-venv/bin/activate
-    ```
+        ```bash
+        python3 -m venv ./venv
+        ```
 
-4. install aiocoap
+5. install aiocoap
 
     First all dependencies have to be installed:
 
-* install autoconf on linux 
+    * install autoconf on linux 
 
-    ```bash
-    sudo apt-get install autoconf -y
-    ```
+        ```bash
+        sudo apt-get install autoconf -y
+        ```
 
-* install python-dev for 
+    * install python-dev for 
 
-    ```bash
-    sudo apt-get install python-dev-is-python3 -y
-    ```
+        ```bash
+        sudo apt-get install python-dev-is-python3 -y
+        ```
 
-* install build-essential
+    * install build-essential
 
-    ```bash
-    sudo apt-get install build-essential -y
-    ```
+        ```bash
+        sudo apt-get install build-essential -y
+        ```
 
-* Finally install aiocoap to the activated python venv
+    * Finally install aiocoap to the activated python venv
 
-    ```bash
-    pip3 install --upgrade "aiocoap[all]"
-    ```
+        ```bash
+        pip3 install --upgrade "aiocoap[all]"
+        ```
 #### **Start the CoAp server**
 
 1. Check the external ipv6 address for your VM.
@@ -384,12 +388,7 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
                 TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
         ```
 
-2. move to the Coap server directory
-    ```bash
-    cd IoT-miniproject-1/Coap-Server/
-    ```
-
-3. Start the CoAp server using your external ipv6 address and port 8683
+2. Start the CoAp server using your external ipv6 address and port 8683
     ```bash
     sh start_server.sh ip=<external-ipv6-address-of-the-VM> port=8683
     ```
