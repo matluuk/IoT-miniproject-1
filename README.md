@@ -4,15 +4,15 @@
 
 ### Introduction
 
-**IoT-miniproject-1** is the first part of the project work assigned at the Internet of Things (521043S-3004) course at University of Oulu in 2023. Goal of the project is to create a firmware for a spesific microcontroller, enabling a secure and energy-efficent transmission of sensor data from microcontroller to a cloud-backend using IPv6 protocol. 
+**IoT-miniproject-1** is the project work assigned at the Internet of Things (521043S-3004) course at University of Oulu in 2023. Goal of the project is to create a firmware for a spesific microcontroller, enabling a secure and energy-efficent transmission of sensor data from microcontroller to a cloud-backend using IPv6 protocol. 
 
 The project uses [Fit IoT-Lab](https://www.iot-lab.info/) remote testbed to book IoT-devices, to program them, interact with them and control them.
 
-
-
-## Table of Contents
+### Table of Contents
 
 - [Getting Started](#getting-started)
+- [Set up CoAP server](#set-up-coap-server)
+- [Create linux virtual machine](#create-linux-virtual-machine)
 - [Usage](#usage)
 - [Code Structure](#code-structure)
 - [Authors](#authors)
@@ -25,7 +25,6 @@ The project uses [Fit IoT-Lab](https://www.iot-lab.info/) remote testbed to book
 Before you begin, ensure you have the following:
 
 1. Access to Fit IoT-Lab account.
-
 2. SSH connection to grenoble.iot-lab.info
 
 ### Build the project
@@ -183,17 +182,16 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
 
 7. After launching ethos_uhcpd, leave the script running!
 
-## Set up server 
+## Create linux virtual machine
 
-For coap server a linux virtual machine is needed. 
+For CoAp server a linux virtual machine is needed. Any linux virtual machine should work, but we walk through how to set up Google Cloud virtual machine. Google cloud has a free trial with 300$ credits to use. The virtual machine needs a external IPV6 ip address for connection with the iot-lab node. 
 
 Requirements for the virtual machine:
-- Ubuntu 20.04
-- external IPV6 address for connecting with iot-lab nodes
-- coap port 8683 open for ingress traffic
-- ICMPv6 traffic allowed for testing ping
-
-Any linux virtual machine should work, but we walk through how to set up Google Cloud virtual machine. Google cloud has a free trial with 300$ credits to use. The virtual machine needs a external IPV6 ip address for connection with the iot-lab node. 
+- runs linux, preferably Ubuntu 20.04
+- has external IPV6 address for connecting with iot-lab nodes, as RIOT supports only ipv6
+- CoAp port 8683 open
+- ICMPv6 traffic allowed
+- ssh connection to the VM
 
 ### Set up Google cloud VM
 
@@ -201,7 +199,7 @@ Google Cloud account is needed for using google Cloud services. At the time bein
 
 https://console.cloud.google.com/?hl=en&_ga=2.87814171.-2055644655.1699615458&_gac=1.116033140.1702051941.CjwKCAiAmsurBhBvEiwA6e-WPIQOg4lsX1QJevny4vxo9FBotFtCxOCFgTHR5MXrhSOSkf66HEamdRoCthsQAvD_BwE
 
-#### Create Virtual private cloud
+### Create Virtual private cloud
 
 Next step is to create vpc (virtual private cloud) for the VM. This is necessary to bget the external ipv6 address for the VM. The VPC:s can be managed at following google cloud console site.
 
@@ -227,7 +225,7 @@ Select all these firewall rules for both ipv4 and ipv6!
 
 </details>
 
-#### Firewall rules
+### Firewall rules
 
 Firewall rules are a set of instructions that control how a firewall device handles incoming and outgoing traffic. They are access control mechanisms that enforce security in networks by blocking or allowing communication based on predetermined criteria. 
 
@@ -254,7 +252,7 @@ If you have followd according to this tutorial, you should have these firewall r
 
 If the firewall rules of your VPC are similar, you can continue.
 
-#### Create Virtual machine
+### Create Virtual machine
 
 The Virtual machine is used to deploy the Coap server. Google cloud VM:s can be managed from the Google Cloud console instances website.
 
@@ -290,11 +288,11 @@ Now everything should be properly set up and the VM instance can be created. The
 
 The SSH connection to the VM instance can be made by clicking the SSH button under Connect. This creates new window with the ssh connection.
 
-### Set up CoAP server to VM
+## Set up CoAP server
 
 Connect to the linux VM, where you want the the CoAp server to be deployed.
 
-#### **Install all the dependencies and set up the python3 virtual environment.**
+### Install all the dependencies and set up the python3 virtual environment.
 
 1. Clone the repository to your folder of choise:
 
@@ -321,7 +319,7 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
 
     * Create the python venv 
     
-    Notice - Use the start_server.sh script activates the venv automatically, so use exactly the same venv location and name
+        Notice - Use the start_server.sh script activates the venv automatically, so use exactly the same venv location and name
 
         ```bash
         python3 -m venv ./venv
@@ -354,7 +352,7 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
         ```bash
         pip3 install --upgrade "aiocoap[all]"
         ```
-#### **Start the CoAp server**
+### Start the CoAp server
 
 1. Check the external ipv6 address for your VM.
 
@@ -397,7 +395,7 @@ Server are now running on the background and can be stopped using the `stop_serv
 ```bash
 sh stop_server.sh
 ```
-#### **LOGS**
+### LOGS
 
 The CoAp server saves logs of every session to `logs` folder. To take a look on the log created. 
 1. Go to the `logs` folder:
@@ -409,11 +407,15 @@ The CoAp server saves logs of every session to `logs` folder. To take a look on 
     ```bash
     tail -f ./<name-of-the-lates-log-file>.log
     ```
-#### **DATA**
+### DATA
 
 The temperature data is stored in files under data folder. One file is made for each day, when temperature datais received. Notice that the data folder is created, when the first temperature vaule is received.
 
-* The temperature data can be shown using the `tail` command.
+1. Go to the `data` folder:
+    ```bash
+    cd data
+    ```
+2. The temperature data can be shown using the `tail` command.
     ```bash
     tail -f ./<name-of-the-lates-data-file>.txt
     ```
@@ -461,7 +463,10 @@ The project has the following code structure:
 ├── Coap-Server
 │   ├── server.py
 │   └── start_server.sh
+│   └── stop_server.sh
 ├── RIOT
+│   └── ...
+├── images
 │   └── ...
 ├── flash_border_router.sh
 └── README.md
