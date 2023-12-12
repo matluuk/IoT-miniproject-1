@@ -1,6 +1,8 @@
 import datetime
 import logging
 import os
+import sys
+import ipaddress
 
 import asyncio
 
@@ -10,8 +12,8 @@ import aiocoap
 
 from pathlib import Path
 
-IP_ADRESS = "2600:1900:4150:7757:0:0:0:0"
-PORT = 8683
+DEFAULT_IP_ADRESS = "2600:1900:4150:7757:0:0:0:0"
+DEFAULT_PORT = 8683
 
 class TemperatureResource(resource.Resource):
     """Resource to put Temperature data to the server. It supports only PUT methods."""
@@ -19,12 +21,14 @@ class TemperatureResource(resource.Resource):
     def __init__(self):
         super().__init__()
         self.set_content(0)
+        self.logger = logging.getLogger('TemperatureResource')
 
     def set_content(self, content):
         self.content = content
 
     async def render_put(self, request):
         print('PUT payload: %s' % request.payload)
+        self.logger.info('PUT payload: %s' % request.payload)
         self.set_content(request.payload)
         temperature = request.payload # .decode()
         write_temperature_to_file(temperature)
@@ -49,8 +53,6 @@ def set_logger():
 
     logging.debug("Logger set up")
 
-    return logging.getLogger('')
-
 def write_temperature_to_file(temperature):
     data_dir = os.path.join(Path(__file__).resolve().parent, "data")
 
@@ -64,10 +66,11 @@ def write_temperature_to_file(temperature):
     current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
     f.write(f"{current_time},{temperature}\n")
     f.close()
-    
+  
 async def main():
     set_logger()
-    
+    logger = logging.getLogger("main")
+
     # Resource tree creation
     root = resource.Site()
 
@@ -75,7 +78,25 @@ async def main():
             resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(['temperature'], TemperatureResource())
 
-    await aiocoap.Context.create_server_context(root, bind=(IP_ADRESS, PORT))
+    ip_address = DEFAULT_IP_ADRESS
+    port = DEFAULT_PORT
+
+    logger.debug("parse command line arguments!")
+    for arg in sys.argv[1:]:
+        if "ip=":
+            try:
+                ip_string = arg.lstrip("ip=")
+                ip_address = ipaddress.ip_address(ip_string)
+                logger.info(f"server ip={arg}")
+            except ValueError:
+                print('ip address is invalid: %s' % ip_string)
+        elif "port=":
+            port = int(arg.lstrip("port="))
+            logger.info(f"server port={arg}")
+        else:
+            print('Usage : %s  ip=<ip_address> port=<port>' % sys.argv[0])
+
+    await aiocoap.Context.create_server_context(root, bind=(ip_address, port))
 
     # Run forever
     await asyncio.get_running_loop().create_future()
