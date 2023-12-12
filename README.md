@@ -286,11 +286,11 @@ Under Advanced options the Networking settings must be changed.
 ![VM instance settings 3](images/VMinstance3.png)
 </details>
 
-Now everything should be properly set up and the VM instance can be created.
+Now everything should be properly set up and the VM instance can be created. The instance should dispaly the external ipv6 address.
+
+![SSH to VM](images/VMinstance4.png)
 
 The SSH connection to the VM instance can be made by clicking the SSH button under Connect. This creates new window with the ssh connection.
-
-![SSH to VM](images/sshToVM.png)
 
 ### Set up CoAP server to VM
 
@@ -309,12 +309,14 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
     sudo apt-get update
     ```
 
-3. install python3.8-venv
+3. Create python venv
+
+* install python3.8-venv
     ```bash
-    sudo apt install python3.8-venv
+    sudo apt install python3.8-venv -y
     ```
 
-4. Create and activate new python venv
+* Create and activate new python venv
 
     ```bash
     python3 -m venv ./CoaP-server-venv
@@ -323,37 +325,71 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
     source ./CoaP-server-venv/bin/activate
     ```
 
-5. intall autoconf on linux 
+4. install aiocoap
+
+    First all dependencies have to be installed:
+
+* install autoconf on linux 
 
     ```bash
-    sudo apt-get install autoconf
+    sudo apt-get install autoconf -y
     ```
 
-6. install python-dev for 
+* install python-dev for 
 
     ```bash
     sudo apt-get install python-dev-is-python3 -y
     ```
 
-7. install build-essential
+* install build-essential
 
     ```bash
-    sudo apt-get install build-essential
+    sudo apt-get install build-essential -y
     ```
 
-8. intall aiocoap to python venv
+* Finally install aiocoap to the activated python venv
 
     ```bash
     pip3 install --upgrade "aiocoap[all]"
     ```
 #### **Start the CoAp server**
 
-1. move to the Coap server directory
+1. Check the external ipv6 address for your VM.
+
+    * Install net-tools
+        ```bash
+        sudo apt-get install net-tools -y
+        ```
+    * Check the external ipv6 address
+        ```bash
+        ifconfig
+        # output:
+        ens4: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1460
+                inet 10.0.0.5  netmask 255.255.255.255  broadcast 0.0.0.0
+                inet6 fe80::4001:aff:fe00:5  prefixlen 64  scopeid 0x20<link>
+                inet6 2600:1900:4150:368:0:3::  prefixlen 128  scopeid 0x0<global> # Take the ipv6 address from this line
+                ether 42:01:0a:00:00:05  txqueuelen 1000  (Ethernet)
+                RX packets 10765  bytes 114444072 (114.4 MB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 7960  bytes 938787 (938.7 KB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+        lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+                inet 127.0.0.1  netmask 255.0.0.0
+                inet6 ::1  prefixlen 128  scopeid 0x10<host>
+                loop  txqueuelen 1000  (Local Loopback)
+                RX packets 216  bytes 22910 (22.9 KB)
+                RX errors 0  dropped 0  overruns 0  frame 0
+                TX packets 216  bytes 22910 (22.9 KB)
+                TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        ```
+
+2. move to the Coap server directory
     ```bash
     cd IoT-miniproject-1/Coap-Server/
     ```
 
-2. Start the CoAp server using oyur external ipv6 address and port 8683
+3. Start the CoAp server using your external ipv6 address and port 8683
     ```bash
     sh start_server.sh ip=<external-ipv6-address-of-the-VM> port=8683
     ```
