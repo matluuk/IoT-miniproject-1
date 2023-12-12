@@ -85,14 +85,14 @@ async def main():
     for arg in sys.argv[1:]:
         if "ip=" in arg:
             try:
-                ip_address = arg.removeprefix("ip=")
+                ip_address = arg[len("ip="):]
                 ipaddress.ip_address(ip_address)
                 logger.info(f"server ip={ip_address}")
             except ValueError:
                 print('ip address is invalid: %s' % ip_address)
                 return
         elif "port=" in arg:
-            port = int(arg.removeprefix("port="))
+            port = int(arg[len("port="):])
             logger.info(f"server port={arg}")
         else:
             print('Usage : %s  ip=<ip_address> port=<port>' % sys.argv[0])
