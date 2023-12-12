@@ -83,19 +83,20 @@ async def main():
 
     logger.debug("parse command line arguments!")
     for arg in sys.argv[1:]:
-        if "ip=":
+        if "ip=" in arg:
             try:
-                ip_string = arg.lstrip("ip=")
-                ip_address = ipaddress.ip_address(ip_string)
-                logger.info(f"server ip={arg}")
+                ip_address = arg.removeprefix("ip=")
+                ipaddress.ip_address(ip_address)
+                logger.info(f"server ip={ip_address}")
             except ValueError:
-                print('ip address is invalid: %s' % ip_string)
-        elif "port=":
-            port = int(arg.lstrip("port="))
+                print('ip address is invalid: %s' % ip_address)
+                return
+        elif "port=" in arg:
+            port = int(arg.removeprefix("port="))
             logger.info(f"server port={arg}")
         else:
             print('Usage : %s  ip=<ip_address> port=<port>' % sys.argv[0])
-
+    
     await aiocoap.Context.create_server_context(root, bind=(ip_address, port))
 
     # Run forever
