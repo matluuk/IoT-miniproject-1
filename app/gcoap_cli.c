@@ -109,6 +109,7 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str, char *port_str)
     }
 
     bytes_sent = gcoap_req_send(buf, len, &remote, _resp_handler, NULL);
+
     if (bytes_sent > 0) {
         req_count++;
     }
@@ -130,6 +131,7 @@ int gcoap_cli_send(char method[], char *data, char *resource)
             code_pos = i;
         }
     }
+
     if (code_pos == -1) {
         return 0;
     }
@@ -146,6 +148,7 @@ int gcoap_cli_send(char method[], char *data, char *resource)
                (unsigned) len);
     if (_send(&buf[0], len, set_addr, set_port) == 0) {
         puts("gcoap_cli: msg send failed");
+        return 0;
     }
     return 1;
 }

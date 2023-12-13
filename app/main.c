@@ -10,7 +10,6 @@
 #include "lpsxxx.h"
 #include "lpsxxx_params.h"
 #include "msg.h"
-
 #include "net/gcoap.h"
 #include "fmt.h"
 #include "gcoap_cli.h"
@@ -33,12 +32,14 @@ typedef struct {
 static data_t data;
 
 // Variables for thread sleep duration
-uint32_t lpsxxx_sleep = 30;
-uint32_t lpsxxx_sniffer_sleep = 30;
+// When testing the project smaller variable values are recommended for example 30
+uint32_t lpsxxx_sleep = 600;
+uint32_t lpsxxx_sniffer_sleep = 600;
 
-// message queue for main thread
+// Message queue for main thread
 #define MAIN_QUEUE_SIZE (4)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
 
 /**
  * @brief Handles temperature readings from the LPSXXX sensor.
@@ -70,11 +71,11 @@ static int lpsxxx_handler(void){
 
 
 /**
- * @brief Compare tens place of current temperature with the last sent temperature.
+ * @brief Compare tenths place of current temperature with the last sent temperature.
  *
  * This function extracts the tens place from both the current temperature
- * and the last sent temperature. It then compares the tens places to determine
- * if there has been a change.
+ * and the last sent temperature. It then compares the tenths places to determine
+ * if there has been a significant change.
  *
  * @return 1 if the tens place has changed, 0 otherwise.
  */
@@ -119,7 +120,7 @@ static void *lpsxxx_read_thread(void *arg){
         if(lpsxxx_handler() != 0){
             printf("lpsxxx_handler failed!");
         }
-        printf("Temperature: %i\n", data.temperature);
+        printf("Temperature: %i.%u °C\n", (data.temperature / 100), (data.temperature % 100));  
         // Release the data lock after processing
         mutex_unlock(&data.lock);
 
@@ -135,8 +136,8 @@ static void *lpsxxx_read_thread(void *arg){
  * @brief Thread function for monitoring changes in the temperature and detecting updates.
  *
  * This thread monitors changes in the temperature data by periodically comparing
- * the current temperature with the last sent temperature. If a change is detected,
- * TODO: TÄHÄN LISÄÄ!!!!!.
+ * the current temperature with the last sent temperature. if a significant change is detected, 
+ * sends the updated temperature data to a server.
  *
  * @param arg Unused argument (may be NULL).
  * @return NULL (not used in this context).
@@ -159,28 +160,42 @@ static void *lpsxxx_sniffer_thread(void *arg) {
 
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
-            printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);
+            printf("Last sent value has changed from %i.%u °C to %i.%u °C !\n", (data.temperature_last_sent / 100), (data.temperature_last_sent % 100), (data.temperature / 100), (data.temperature % 100));  
 
-            // Datan lähetys serverille
+            // Sending data to server
             char response[5];
             char resource[] = "/temperature";
-            uint16_t temp = data.temperature;
-            int temp_abs = data.temperature / 100;
-            temp -= temp_abs * 100;
-            sprintf(response, "%2i.%2i", temp_abs, temp);
+            sprintf(response, "%i.%u", (data.temperature / 100), (data.temperature % 100));
 
-            gcoap_access("put", &response[0], &resource[0]);
+            gcoap_cli_send("put", &response[0], &resource[0]);
             data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
         }
-
         // Release the data lock after processing
         mutex_unlock(&data.lock);
     }
-
     // This return statement is not reached in this context
     return NULL;
+}
+
+
+/**
+ * @brief Prints the startup information for the program.
+ */
+void printStartupInfo(void) {
+
+    printf("==================================================================\n");
+    printf("                     Internet of Things 2023\n");                   
+    printf("                          Miniproject 1\n");
+    printf("------------------------------------------------------------------\n");
+    printf("                            Welcome!\n\n");
+    printf("This program reads temperature from IoT-Lab M3 MCU and sends the\n");
+    printf("data to backend cloud server using CoAP protocol\n");
+    printf("------------------------------------------------------------------\n");
+    printf("Documentation: https://github.com/matluuk/IoT-miniproject-1\n");
+    printf("Developed by: Matti Luukkonen, Touko Kinnunen and Hermanni Hanhela\n");
+    printf("==================================================================\n");
 }
 
 
@@ -193,6 +208,8 @@ static void *lpsxxx_sniffer_thread(void *arg) {
  * @return 0 on successful execution (Note: The return statement is not used in this context).
  */
 int main(void) {
+
+    printStartupInfo();
 
     // Initialize the xtimer module
     xtimer_init();
