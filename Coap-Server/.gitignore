@@ -1,5 +1,5 @@
 venv/
 logs/
 data/
-*.out
-
+*.log
+save_pid.txt
