@@ -8,179 +8,34 @@
 
 The project uses [Fit IoT-Lab](https://www.iot-lab.info/) remote testbed to book IoT-devices, to program them, interact with them and control them.
 
+Simple python CoAp server is used to receive temperature data from iot-lab node. The server writes the temperature data to a file, where it could be shown.
+
 ### Table of Contents
 
-- [Getting Started](#getting-started)
-- [Set up CoAP server](#set-up-coap-server)
+- [Video tutorial](#video-tutorial)
 - [Create linux virtual machine](#create-linux-virtual-machine)
-- [Usage](#usage)
+    - [Set up Google cloud VM](#set-up-google-cloud-vm)
+    - [Create Virtual private cloud](#create-virtual-private-cloud)
+    - [Firewall rules](#firewall-rules)
+    - [Create VM instance](#create-vm-instance)
+- [Set up CoAP server](#set-up-coap-server)
+    - [Install all the dependencies and set up the python3 virtual environment.](#install-all-the-dependencies-and-set-up-the-python3-virtual-environment)
+    - [Start CoAp server](#start-coap-server)
+    - [LOGS](#logs)
+    - [DATA](#data)
+- [Set up the iot-lab-nodes](#set-up-the-iot-lab-nodes)
+    - [IoT-lab account](#iot-lab-account)
+    - [SSH connection to iot-lab](#ssh-connection-to-iot-lab)
+    - [Build the project](#build-the-project)
+    - [Set up Fit IoT-Lab experiment](#set-up-fit-iot-lab-experiment)
+    - [Set up border router](#set-up-border-router)
+    - [Flash iot-lab node](#flash-iot-lab-node)
+    - [Free up iot-lab resources](#free-up-iot-lab-resources)
 - [Code Structure](#code-structure)
 - [Authors](#authors)
 
-
-## Getting Started
-
-### Prerequisites
-
-Before you begin, ensure you have the following:
-
-1. Access to Fit IoT-Lab account.
-2. SSH connection to grenoble.iot-lab.info
-
-### Build the project
-
-1. Connect to grenoble.iot-lab.info:
-
-    ```batch
-    ssh <username>@grenoble.iot-lab.info
-    ```
-
-2. Clone the repository to your folder of choise at grenoble.iot-lab.info:
-
-    ```bash
-    git clone https://github.com/matluuk/IoT-miniproject-1.git
-    ```
-
-3. Init the RIOT-submodule:
-
-    ```bash
-    git submodule init
-    ```
-
-4. Update the RIOT-submodule:
-
-    ```bash
-    git submodule update
-    ```
-
-5. Change into the miniproject-1 repository working directory:
-
-    ```bash
-    cd IoT-miniproject-1/app
-    ```
-
-6. Set source:
-
-    ```bash
-    source /opt/riot.source
-    ```
-
-7. Build the project:
-
-    ```bash
-    make
-    ```
-
-
-### Set up Fit IoT-Lab experiment
-
-Set up Fit IoT-Lab experiment with two nodes for device firmware and border router:
-
-1. Connect to grenoble.iot-lab.info IF not already:
-
-    ```batch
-    ssh <username>@grenoble.iot-lab.info
-    ```
-
-2. Submit an experiment at grenoble for 20 minutes:
-
-    ```bash
-    iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
-    ```
-
-3. Wait for the experiment to be in the Running state:
-
-    ```bash
-    iotlab-experiment wait --timeout 30 --cancel-on-timeout
-    ```
-
-4. Get the experiment nodes list:
-
-    ```bash
-    # Command returns the ID of both nodes, they are needed later!
-    iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
-    ```
-
-### Set up border router
-
-1. Connect to grenoble.iot-lab.info IF not already:
-
-    ```batch
-    ssh <username>@grenoble.iot-lab.info
-    ```
-
-2. Change into the miniproject-1 repository directory:
-
-    ```bash
-    cd IoT-miniproject-1
-    ```
-
-3. Run flash_border_router.sh after booking the experiment:
-
-    ```bash
-    sh flash_border_router.sh <board-id>
-    ```
-
-    ```bash
-    # Example to get correct <board.id>
-
-    user@grenoble.iot-lab.info:~$ iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
-    [
-    "m3-6.grenoble.iot-lab.info",
-    "m3-7.grenoble.iot-lab.info"
-    ]
-    # In this example <board-id> = 6 or 7
-    # Only need to pick one ID!
-    ```
-
-4. Check which tap interfaces are open:
-
-    ```bash
-    ip addr show | grep tap
-    ```
-
-5. Check which ipv6 prefixes are already used:
-
-    ```bash
-    ip -6 route
-    ```
-
-6. Launch the ethos_uhcpd command with:
-
-    ```bash
-    sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
-    ```
-
-    ```bash
-    # Example to get correct <id>, <num> and <ipv6_prefix>
-    
-    # For <id>:
-    # Use the same ID as you chose earlier with command: sh flash_border_router.sh <board-id>
-
-    #For <num>:
-    user@grenoble.iot-lab.info:~$ ip addr show | grep tap
-    313: tap0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
-    ...
-    316: tap1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
-    ...
-    582: tap8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
-    ...
-    # Example list of network interfaces already in use. This example has 3 network interfaces (eg. tap0, tap1 and tap8). 
-    # Choose a free interface, for example <id> = tap8 + 1 = 9
-
-    #For <ipv6_prefix>
-    user@grenoble.iot-lab.info:~$ ip -6 route
-    2001:660:5307:3100::/64 via fe80::2 dev tap0 metric 1024 linkdown  pref medium
-    2001:660:5307:3102::/64 via fe80::2 dev tap2 metric 1024 linkdown  pref medium
-    2001:660:5307:3103::/64 via fe80::2 dev tap3 metric 1024 linkdown  pref medium
-    2001:660:5307:3104::/64 via fe80::2 dev tap4 metric 1024 linkdown  pref medium
-    2001:660:5307:3107::/64 via fe80::2 dev tap100 metric 1024 linkdown  pref medium
-    ...
-    # Example list of ipv6 prefixes in use. 
-    # Choose a free prefix, for example <ipv6_prefix> = 2001:660:5307:3108
-    ```
-
-7. After launching ethos_uhcpd, leave the script running!
+## Video tutorial
+[Link to tutorial](youtube.com)
 
 ## Create linux virtual machine
 
@@ -191,7 +46,7 @@ Requirements for the virtual machine:
 - has external IPV6 address for connecting with iot-lab nodes, as RIOT supports only ipv6
 - CoAp port 8683 open
 - ICMPv6 traffic allowed
-- ssh connection to the VM
+- SSH connection to the VM
 
 ### Set up Google cloud VM
 
@@ -252,7 +107,7 @@ If you have followd according to this tutorial, you should have these firewall r
 
 If the firewall rules of your VPC are similar, you can continue.
 
-### Create Virtual machine
+### Create VM instance
 
 The Virtual machine is used to deploy the Coap server. Google cloud VM:s can be managed from the Google Cloud console instances website.
 
@@ -352,7 +207,7 @@ Connect to the linux VM, where you want the the CoAp server to be deployed.
         ```bash
         pip3 install --upgrade "aiocoap[all]"
         ```
-### Start the CoAp server
+### Start CoAp server
 
 1. Check the external ipv6 address for your VM.
 
@@ -420,11 +275,189 @@ The temperature data is stored in files under data folder. One file is made for 
     tail -f ./<name-of-the-lates-data-file>.txt
     ```
 
-## Usage
+## Set up the iot-lab-nodes
 
-To use this project, follow these guidelines:
+### IoT-lab account
+
+IoT-lab account is requiret to work with iot-lab. It can be requested by filling a sign up form. More information about iot-lab account can be found from iot-lab documentation.
+
+* [sign-up form](https://www.iot-lab.info/testbed/signup)
+* [more information about iot-lab accounts](https://iot-lab.github.io/docs/getting-started/user-account/)
+
+### SSH connection to iot-lab
+
+SSH connection to the iot-lab sites can be created by following iot-lab documentation about it:
+
+* [IoT-lab SSH documentation](https://iot-lab.github.io/docs/getting-started/ssh-access/)
+
+### Build the project
+
+In this tutorial we use grenoble iot-lab site. Other sites with IoT-LAB M3 board could be also used. More information about iot-lab sites can be cound from iot-lab documentation.
+
+* [iot-lab sites](https://iot-lab.github.io/docs/deployment/grenoble/)
+
+1. Connect to grenoble.iot-lab.info:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Clone the repository to your folder of choise at grenoble.iot-lab.info:
+
+    ```bash
+    git clone https://github.com/matluuk/IoT-miniproject-1.git
+    ```
+
+3. Init the RIOT-submodule:
+
+    ```bash
+    git submodule init
+    ```
+
+4. Update the RIOT-submodule:
+
+    ```bash
+    git submodule update
+    ```
+
+5. Change into the miniproject-1 repository working directory:
+
+    ```bash
+    cd IoT-miniproject-1/app
+    ```
+
+6. Set source:
+
+    ```bash
+    source /opt/riot.source
+    ```
+
+7. Build the project:
+
+    ```bash
+    make
+    ```
+
+
+### Set up Fit IoT-Lab experiment
+
+Set up Fit IoT-Lab experiment with two nodes for device firmware and border router:
 
 1. Connect to grenoble.iot-lab.info IF not already:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Submit an experiment for two nodes at grenoble for 60 minutes:
+
+    ```bash
+    iotlab-experiment submit -n "IoT-miniproject-1" -d 60 -l 2,archi=m3:at86rf231+site=grenoble
+    ```
+
+3. Wait for the experiment to be in the Running state:
+
+    ```bash
+    iotlab-experiment wait --timeout 30 --cancel-on-timeout
+    ```
+
+4. Get the experiment nodes list:
+
+    ```bash
+    # Command returns the ID of both nodes, they are needed later!
+    iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
+    ```
+
+### Set up border router
+
+One iot-lab node is used as a border router. The connection to the internet is made through the border router.
+
+More information about iot-lab ipv6 connections and the border router can be found [from iot-lab documentation.](https://iot-lab.github.io/docs/getting-started/ipv6/)
+
+1. Connect to grenoble.iot-lab.info IF not already:
+
+    ```batch
+    ssh <username>@grenoble.iot-lab.info
+    ```
+
+2. Change into the miniproject-1 repository directory:
+
+    ```bash
+    cd IoT-miniproject-1
+    ```
+
+3. Run flash_border_router.sh after booking the experiment:
+
+    ```bash
+    sh flash_border_router.sh <board-id>
+    ```
+
+    ```bash
+    # Example to get correct <board.id>
+
+    user@grenoble.iot-lab.info:~$ iotlab-experiment --jmespath="items[*].network_address | sort(@)" get --nodes
+    [
+    "m3-6.grenoble.iot-lab.info",
+    "m3-7.grenoble.iot-lab.info"
+    ]
+    # In this example <board-id> = 6 or 7
+    # Only need to pick one ID!
+    ```
+
+4. Check which tap interfaces are open:
+
+    ```bash
+    ip addr show | grep tap
+    ```
+
+5. Check which ipv6 prefixes are already used:
+
+    ```bash
+    ip -6 route
+    ```
+
+6. Launch the ethos_uhcpd command with:
+
+    ```bash
+    sudo ethos_uhcpd.py m3-<id> tap<num> <ipv6_prefix>::/64
+    ```
+
+    ```bash
+    # Example to get correct <id>, <num> and <ipv6_prefix>
+    
+    # For <id>:
+    # Use the same ID as you chose earlier with command: sh flash_border_router.sh <board-id>
+
+    #For <num>:
+    user@grenoble.iot-lab.info:~$ ip addr show | grep tap
+    313: tap0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+    316: tap1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+    582: tap8: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    ...
+    # Example list of network interfaces already in use. This example has 3 network interfaces (eg. tap0, tap1 and tap8). 
+    # Choose a free interface, for example <id> = tap8 + 1 = 9
+
+    #For <ipv6_prefix>
+    user@grenoble.iot-lab.info:~$ ip -6 route
+    2001:660:5307:3100::/64 via fe80::2 dev tap0 metric 1024 linkdown  pref medium
+    2001:660:5307:3102::/64 via fe80::2 dev tap2 metric 1024 linkdown  pref medium
+    2001:660:5307:3103::/64 via fe80::2 dev tap3 metric 1024 linkdown  pref medium
+    2001:660:5307:3104::/64 via fe80::2 dev tap4 metric 1024 linkdown  pref medium
+    2001:660:5307:3107::/64 via fe80::2 dev tap100 metric 1024 linkdown  pref medium
+    ...
+    # Example list of ipv6 prefixes in use. 
+    # Choose a free prefix, for example <ipv6_prefix> = 2001:660:5307:3108
+    ```
+
+7. After launching ethos_uhcpd, leave the script running!
+
+### Flash iot-lab node
+
+To flash the application to iot-lab node, follow these guidelines:
+
+1. Open new ssh connection to grenoble.iot-lab.info:
 
     ```batch
     ssh <username>@grenoble.iot-lab.info
@@ -436,15 +469,32 @@ To use this project, follow these guidelines:
     cd IoT-miniproject-1/app
     ```
 
-3. Flash the firmware into the experiment node:
+3. Set source:
 
     ```bash
-    make IOTLAB_NODE=m3-114 DEFAULT_CHANNEL=18 DEFAULT_PAN_ID=0xbcb4 flash 
+    source /opt/riot.source
     ```
 
-### Free up resources:
+4. Flash the firmware into the experiment node. Use different `<board-id>` than for border router.
 
-After finished with the experiment, stop your experiment to free up the experiment nodes at Fit IoT-Lab:
+    ```bash
+    make IOTLAB_NODE=m3-<board-id> DEFAULT_CHANNEL=18 DEFAULT_PAN_ID=0xbcb4 flash 
+    ```
+
+### Terminal connection to iot-lab node
+
+Terminal connection can be used to see what is happening on iot-lab node. Terminal connection can be made with `nc` command. Notice that the terminal connection is made automatically for the border router, when using the ethos_uhcpd command.
+
+* Command:
+    ```bash
+    nc m3-<board-id> 20000
+    ```
+
+The application prints some information about what is happening in the program. `help` command can be used to list all available commands. The `ping` command is especially useful to see if internet connection is working.
+
+### Free up iot-lab resources
+
+After finished with the iot-lab experiment, stop your experiment to free up the nodes used at Fit IoT-Lab:
 
 ```bash
 iotlab-experiment stop
