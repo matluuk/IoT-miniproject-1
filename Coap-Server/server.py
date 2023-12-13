@@ -30,7 +30,7 @@ class TemperatureResource(resource.Resource):
         print('PUT payload: %s' % request.payload)
         self.logger.info('PUT payload: %s' % request.payload)
         self.set_content(request.payload)
-        temperature = request.payload # .decode()
+        temperature = request.payload.decode()
         write_temperature_to_file(temperature)
         
         return aiocoap.Message(code=aiocoap.CHANGED)
