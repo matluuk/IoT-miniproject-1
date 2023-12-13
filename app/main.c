@@ -32,8 +32,9 @@ typedef struct {
 static data_t data;
 
 // Variables for thread sleep duration
-uint32_t lpsxxx_sleep = 30;
-uint32_t lpsxxx_sniffer_sleep = 30;
+// When testing the project smaller variable values are recommended for example 30
+uint32_t lpsxxx_sleep = 600;
+uint32_t lpsxxx_sniffer_sleep = 600;
 
 // Message queue for main thread
 #define MAIN_QUEUE_SIZE (4)
@@ -119,7 +120,7 @@ static void *lpsxxx_read_thread(void *arg){
         if(lpsxxx_handler() != 0){
             printf("lpsxxx_handler failed!");
         }
-        printf("Temperature: %i\n", data.temperature);  // Poistetaan viimeisimmästä versiosta!!         
+        printf("Temperature: %i.%u °C\n", (data.temperature / 100), (data.temperature % 100));  
         // Release the data lock after processing
         mutex_unlock(&data.lock);
 
@@ -137,7 +138,6 @@ static void *lpsxxx_read_thread(void *arg){
  * This thread monitors changes in the temperature data by periodically comparing
  * the current temperature with the last sent temperature. if a significant change is detected, 
  * sends the updated temperature data to a server.
- * If transmission fails, the functions tries to resend the data for maximum of 5 times.
  *
  * @param arg Unused argument (may be NULL).
  * @return NULL (not used in this context).
@@ -160,29 +160,15 @@ static void *lpsxxx_sniffer_thread(void *arg) {
 
         // Compare the current temperature with the last sent temperature
         if (compareTo_LastSent() == 1) {
-            printf("Last sent value has changed from %i to %i!\n", data.temperature_last_sent, data.temperature);   // Poistetaan viimeisimmästä versiosta!!   
+            printf("Last sent value has changed from %i.%u °C to %i.%u °C !\n", (data.temperature_last_sent / 100), (data.temperature_last_sent % 100), (data.temperature / 100), (data.temperature % 100));  
 
             // Sending data to server
             char response[5];
             char resource[] = "/temperature";
-            uint16_t temp = data.temperature;
-            int temp_abs = data.temperature / 100;
-            temp -= temp_abs * 100;
-            sprintf(response, "%2i.%2i", temp_abs, temp);   
+            sprintf(response, "%i.%u", (data.temperature / 100), (data.temperature % 100));
 
-            // If sending fails -> resend max 5 times
-            for(uint8_t x = 1; x <6; x++){
-                if(gcoap_cli_send("put", &response[0], &resource[0]) == 0){
-                    printf("Resending the temperature %i/5\n", x);
-                    continue;
-                }
-                else{
-                    // Update last sent data
-                    data.temperature_last_sent = data.temperature;
-                    break;
-                }
-                printf("Resending failed! Good luck next time\n");
-            }
+            gcoap_cli_send("put", &response[0], &resource[0]);
+            data.temperature_last_sent = data.temperature;
         } else {
             printf("Value has not changed!\n");
         }
