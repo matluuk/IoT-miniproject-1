@@ -201,7 +201,7 @@ https://console.cloud.google.com/?hl=en&_ga=2.87814171.-2055644655.1699615458&_g
 
 ### Create Virtual private cloud
 
-Next step is to create vpc (virtual private cloud) for the VM. This is necessary to bget the external ipv6 address for the VM. The VPC:s can be managed at following google cloud console site.
+Next step is to create vpc (virtual private cloud) for the VM. This is necessary to get the external ipv6 address for the VM. The VPC:s can be managed at following google cloud console site.
 
 https://console.cloud.google.com/networking/networks?hl=en&_ga=2.16771894.-1464318792.1699625730&_gac=1.195093086.1701470264.CjwKCAiApaarBhB7EiwAYiMwqnFJQWu6iGIMccKLYWIfXNoxHQGC0UXqAEzLXMDN3NWpUHO9M_Fa9RoC834QAvD_BwE
 
@@ -246,7 +246,7 @@ This rule can be created by clicking the `CREATE FIREWALL RULE` button and using
 
 </details>
 
-If you have followd according to this tutorial, you should have these firewall rules for the newly created VPC. Notice, wtät there are also some firewall rules for default VPC.
+If you have followd according to this tutorial, you should have these firewall rules for the newly created VPC. Notice, that there are also some firewall rules for default VPC.
 
 ![Firewall rules](images/firewallrules.png)
 
