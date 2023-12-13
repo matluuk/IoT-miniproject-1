@@ -12,7 +12,7 @@ Simple python CoAp server is used to receive temperature data from iot-lab node.
 
 ### Table of Contents
 
-- [Getting Started](#getting-started)
+- [Video tutorial](#video-tutorial)
 - [Create linux virtual machine](#create-linux-virtual-machine)
     - [Set up Google cloud VM](#set-up-google-cloud-vm)
     - [Create Virtual private cloud](#create-virtual-private-cloud)
@@ -34,12 +34,8 @@ Simple python CoAp server is used to receive temperature data from iot-lab node.
 - [Code Structure](#code-structure)
 - [Authors](#authors)
 
-
-## Getting Started
-
-### Prerequisites
-
-Before you begin, ensure you have Access to Fit IoT-Lab account.
+## Video tutorial
+[Link to tutorial](youtube.com)
 
 ## Create linux virtual machine
 
@@ -353,10 +349,10 @@ Set up Fit IoT-Lab experiment with two nodes for device firmware and border rout
     ssh <username>@grenoble.iot-lab.info
     ```
 
-2. Submit an experiment for two nodes at grenoble for 20 minutes:
+2. Submit an experiment for two nodes at grenoble for 60 minutes:
 
     ```bash
-    iotlab-experiment submit -n "IoT-miniproject-1" -d 20 -l 2,archi=m3:at86rf231+site=grenoble
+    iotlab-experiment submit -n "IoT-miniproject-1" -d 60 -l 2,archi=m3:at86rf231+site=grenoble
     ```
 
 3. Wait for the experiment to be in the Running state:
@@ -467,16 +463,16 @@ To flash the application to iot-lab node, follow these guidelines:
     ssh <username>@grenoble.iot-lab.info
     ```
 
-2. Set source:
-
-    ```bash
-    source /opt/riot.source
-    ```
-
-3. Change into the miniproject-1 repository working directory:
+2. Change into the miniproject-1 repository working directory:
 
     ```bash
     cd IoT-miniproject-1/app
+    ```
+
+3. Set source:
+
+    ```bash
+    source /opt/riot.source
     ```
 
 4. Flash the firmware into the experiment node. Use different `<board-id>` than for border router.
@@ -484,6 +480,17 @@ To flash the application to iot-lab node, follow these guidelines:
     ```bash
     make IOTLAB_NODE=m3-<board-id> DEFAULT_CHANNEL=18 DEFAULT_PAN_ID=0xbcb4 flash 
     ```
+
+### Terminal connection to iot-lab node
+
+Terminal connection can be used to see what is happening on iot-lab node. Terminal connection can be made with `nc` command. Notice that the terminal connection is made automatically for the border router, when using the ethos_uhcpd command.
+
+* Command:
+    ```bash
+    nc m3-<board-id> 20000
+    ```
+
+The application prints some information about what is happening in the program. `help` command can be used to list all available commands. The `ping` command is especially useful to see if internet connection is working.
 
 ### Free up iot-lab resources
 
