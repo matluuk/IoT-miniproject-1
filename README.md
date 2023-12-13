@@ -12,7 +12,7 @@ Simple python CoAp server is used to receive temperature data from iot-lab node.
 
 ### Table of Contents
 
-- [Video tutorial](#video-tutorial)
+- [Video demonstration](#video-demonstration)
 - [Create linux virtual machine](#create-linux-virtual-machine)
     - [Set up Google cloud VM](#set-up-google-cloud-vm)
     - [Create Virtual private cloud](#create-virtual-private-cloud)
@@ -35,8 +35,8 @@ Simple python CoAp server is used to receive temperature data from iot-lab node.
 - [Code Structure](#code-structure)
 - [Authors](#authors)
 
-## Video tutorial
-[Link to tutorial](youtube.com)
+## Video demonstration
+[Link to video demonstration](https://youtu.be/paAgqlTc-Gs)
 
 ## Create linux virtual machine
 
