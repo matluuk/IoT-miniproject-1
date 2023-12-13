@@ -27,6 +27,7 @@ Simple python CoAp server is used to receive temperature data from iot-lab node.
     - [IoT-lab account](#iot-lab-account)
     - [SSH connection to iot-lab](#ssh-connection-to-iot-lab)
     - [Build the project](#build-the-project)
+    - [Changes to files](#changes-to-files)
     - [Set up Fit IoT-Lab experiment](#set-up-fit-iot-lab-experiment)
     - [Set up border router](#set-up-border-router)
     - [Flash iot-lab node](#flash-iot-lab-node)
@@ -289,6 +290,12 @@ IoT-lab account is requiret to work with iot-lab. It can be requested by filling
 SSH connection to the iot-lab sites can be created by following iot-lab documentation about it:
 
 * [IoT-lab SSH documentation](https://iot-lab.github.io/docs/getting-started/ssh-access/)
+
+### Changes to files
+
+1. The server ip address is hard coded to the application. It must be changed in `app/gcoap_cli.c` in variable `set_addr`
+
+2. The delay between temperature readings and data sending is 10 minutes as we think it will be good delay for real scenarios. The delays are defined in `app/main.c` in variables `lpsxxx_sleep` and `lpsxxx_sniffer_sleep`. These variables should propably be changed while testing the program.
 
 ### Build the project
 
