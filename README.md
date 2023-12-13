@@ -308,31 +308,37 @@ In this tutorial we use grenoble iot-lab site. Other sites with IoT-LAB M3 board
     git clone https://github.com/matluuk/IoT-miniproject-1.git
     ```
 
-3. Init the RIOT-submodule:
+3. Change into the miniproject-1 repository working directory:
+
+    ```bash
+    cd IoT-miniproject-1
+    ```
+
+4. Init the RIOT-submodule:
 
     ```bash
     git submodule init
     ```
 
-4. Update the RIOT-submodule:
+5. Update the RIOT-submodule:
 
     ```bash
     git submodule update
     ```
 
-5. Change into the miniproject-1 repository working directory:
+6. Change into the app directory:
 
     ```bash
-    cd IoT-miniproject-1/app
+    cd app
     ```
 
-6. Set source:
+7. Set source:
 
     ```bash
     source /opt/riot.source
     ```
 
-7. Build the project:
+8. Build the project:
 
     ```bash
     make
